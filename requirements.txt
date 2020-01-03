@@ -1,1 +1,2 @@
+requests
 vk-api==11.6.1

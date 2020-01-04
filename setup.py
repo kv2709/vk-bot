@@ -2,11 +2,10 @@
 
 import random
 import json
-import os
-from boto.s3.connection import S3Connection
+import boto3
 
-TOKEN_API = S3Connection(os.environ['TOKEN_API_HEROKU'])
-APP_ID = S3Connection(os.environ['TOKEN_WEATHER_HEROKU'])
+TOKEN_API = boto3.resource('TOKEN_API_HEROKU')
+APP_ID = boto3.resource('TOKEN_WEATHER_HEROKU')
 
 GROUP_ID = 190385197
 key_board_dict = {"one_time": False,

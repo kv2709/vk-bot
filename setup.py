@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
-# heroku ps:scale worker=1 старт процесса
-# heroku ps:scale worker=0 останов процесса
+
 import random
 import json
-from weather_request import request_current_weather, request_forecast
+import os
+from boto.s3.connection import S3Connection
 
-STR_WTH_BSK1 = "Погода в Бийске\nна " + request_current_weather(1510018)
-STR_WTH_BSK5 = "Прогноз погоды в Бийске на 5 дней\n" + request_forecast(1510018)
-STR_WTH_NSK1 = "Погода в Новосибирске\nна " + request_current_weather(1496747)
-STR_WTH_NSK5 = "Прогноз погоды в Новосибирске на 5 дней\n" + request_forecast(1496747)
+TOKEN_API = S3Connection(os.environ['TOKEN_API_HEROKU'])
+APP_ID = S3Connection(os.environ['TOKEN_WEATHER_HEROKU'])
 
-TOKEN_API = '329cff0dfbb52cda1f3f64a65d9a08cba6313e424121bc94347b4765dc8f65cbdc0dce00d17bd60379ea5'
 GROUP_ID = 190385197
-
 key_board_dict = {"one_time": False,
                   'buttons': [
                               [{"action": {"type": "text",

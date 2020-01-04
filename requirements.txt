@@ -1,2 +1,3 @@
-requests
+boto==2.49.0
+requests==2.22.0
 vk-api==11.6.1

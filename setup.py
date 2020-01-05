@@ -3,9 +3,9 @@
 import random
 import json
 import boto3
-
-TOKEN_API = boto3.resource('TOKEN_API_HEROKU')
-APP_ID = boto3.resource('TOKEN_WEATHER_HEROKU')
+import os
+TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
+APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
 
 GROUP_ID = 190385197
 key_board_dict = {"one_time": False,

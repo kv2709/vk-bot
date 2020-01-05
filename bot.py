@@ -76,5 +76,6 @@ class VKBot:
 
 
 if __name__ == '__main__':
+    print(TOKEN_API)
     bot = VKBot(token=TOKEN_API, group_id=GROUP_ID)
     bot.run()

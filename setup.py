@@ -2,7 +2,6 @@
 
 import random
 import json
-import boto3
 import os
 TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
 APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
@@ -87,7 +86,6 @@ VkBotEventType.MESSAGE_NEW
   'group_id': 190385197, 
   'event_id': 'ac2e1a246bc6df35aa61a84b87fc47c3f67072d1'
  }
-
   
 VkBotEventType.MESSAGE_NEW 
  class 'vk_api.bot_longpoll.VkBotMessageEvent'
@@ -119,10 +117,6 @@ VkBotEventType.MESSAGE_NEW
   'group_id': 190385197, 
   'event_id': 'fe6c51bb2c55b921431fc0fee81f872a11095246'
  }
-
-
-
-
 
 VkBotEventType.MESSAGE_REPLY 
  class 'vk_api.bot_longpoll.VkBotMessageEvent'
@@ -163,7 +157,6 @@ VkBotEventType.MESSAGE_REPLY
   'group_id': 190385197, 
   'event_id': 'a4a69ef41abea2b198ad4139aeb7b877461d8659'
  }
-
 
 VkBotEventType.MESSAGE_MESSAGE_REPLY 
  class 'vk_api.bot_longpoll.VkBotMessageEvent'

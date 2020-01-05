@@ -7,7 +7,17 @@ from weather_request import WeatherGetter
 
 
 class VKBot:
+    """
+    Класс бота, обрабатывающий события, полученные в результате
+    прослушивания ответов от сервера ВК на LongPoll запросы
+    """
     def __init__(self, token='', group_id=0):
+        """
+        Инициализация объекта калсса
+        :param token: Токен доступа к АПИ ВК, полученный из переменной окружения Heroku
+                      Определен в модуле setup
+        :param group_id: номер сообщества бота. Определен в модуле setup
+        """
         self.token = token
         self.group_id = group_id
         self.vk_api_obj = vk_api.VkApi(token=self.token)
@@ -16,6 +26,10 @@ class VKBot:
         self.weather = WeatherGetter()
 
     def run(self):
+        """
+        Основной метод класса получающий события от лонгпуллера и вызывающий метод
+        self.on_event для их обработки
+        """
         for event in self.vk_bot_pollster.listen():
             try:
                 self.on_event(event=event)
@@ -23,6 +37,13 @@ class VKBot:
                 print(err)
 
     def on_event(self, event=None):
+        """
+        Обработчик событий. Реализован стартовый ответ на команду <Начать> с выводом приветствия
+        пользоваетля и постановкой клавиатуры с четырьмя кнопками, один эхо-ответ на произвольное
+        сообщение от пользователя и четыре обработчика для прогнозов погоды, для которых поставлены кнопки
+        :param event: событие, которое обрабатывает метод
+
+        """
         if event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == 'Начать':
             user_id = event.obj.message['from_id']
             user_info = self.vk_api.users.get(user_id=user_id)

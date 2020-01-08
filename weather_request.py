@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import datetime
 import requests
 from setup import APP_ID
@@ -5,24 +7,16 @@ from setup import APP_ID
 WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
 FORECAST_URL = "http://api.openweathermap.org/data/2.5/forecast"
 
+MONTH_LST = ['января', 'февраля', 'марта', 'аплеля', 'мая', 'июня',
+             'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
+WIND_DIRECT = [' С', 'СВ', ' В', 'ЮВ', ' Ю', 'ЮЗ', ' З', 'СЗ']
+
 
 class WeatherGetter:
     """
     Класс выдачи текущей погоды и пятидневного прогноза по любому городу
     от сервиса openweathermap.org
     """
-    def __init__(self):
-        """
-        Инициализация класса. Токен доступа к АПИ openweathermap.org получается
-        из переменной окружения Heroku, определен в модуле setup
-        """
-        self.app_id = APP_ID
-        self.weather_url = WEATHER_URL
-        self.forecast_url = FORECAST_URL
-        self.month_lst = ['января', 'февраля', 'марта', 'аплеля', 'мая', 'июня',
-                          'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
-        self.month_count_day_lst = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
     @staticmethod
     def get_wind_direction(wind_deg=0):
         """
@@ -31,16 +25,18 @@ class WeatherGetter:
         :param wind_deg: направление ветра в градусах
         :return: строка в символьной нотации из w_direct
         """
-        w_direct = [' С', 'СВ', ' В', 'ЮВ', ' Ю', 'ЮЗ', ' З', 'СЗ']
         direct_str = ''
-        for i in range(0, 8):
-            step = 45.
-            min_deg = i * step - 45 / 2.
-            max_deg = i * step + 45 / 2.
-            if i == 0 and wind_deg > 360 - 45 / 2.:
+        step = 45.
+        half_step = 22.5
+        rest_sector = 360 - half_step
+
+        for i in range(8):
+            min_deg = i * step - half_step
+            max_deg = i * step + half_step
+            if i == 0 and wind_deg > rest_sector:
                 wind_deg = wind_deg - 360
             if min_deg <= wind_deg <= max_deg:
-                direct_str = w_direct[i]
+                direct_str = WIND_DIRECT[i]
                 break
         return direct_str
 
@@ -52,13 +48,13 @@ class WeatherGetter:
         состояние(облачность, осадки))
         """
         try:
-            res = requests.get(self.weather_url, params={'id': city_id,
-                                                         'units': 'metric',
-                                                         'lang': 'ru',
-                                                         'APPID': self.app_id})
+            res = requests.get(WEATHER_URL, params={'id': city_id,
+                                                    'units': 'metric',
+                                                    'lang': 'ru',
+                                                    'APPID': APP_ID})
             data = res.json()
             now_dt = datetime.datetime.utcfromtimestamp(data['dt']) + datetime.timedelta(hours=7)
-            now_str = f"{str(now_dt.day)} {self.month_lst[now_dt.month - 1]} {str(now_dt.year)} года " \
+            now_str = f"{str(now_dt.day)} {MONTH_LST[now_dt.month - 1]} {str(now_dt.year)} года " \
                       f"{str(now_dt.hour).zfill(2)}:{str(now_dt.minute).zfill(2)}"
 
             weather_str = now_str + f"\n темп: {str(round(data['main']['temp'], 1))}C  " \
@@ -82,7 +78,7 @@ class WeatherGetter:
             res = requests.get(FORECAST_URL, params={'id': city_id,
                                                      'units': 'metric',
                                                      'lang': 'ru',
-                                                     'APPID': self.app_id})
+                                                     'APPID': APP_ID})
             data = res.json()
             count_cycle = 0
             for i in data['list']:
@@ -95,7 +91,7 @@ class WeatherGetter:
                 time_local = dt_local_str[11:13]
 
                 if count_cycle == 1 or (int(time_local) in [0, 1]):
-                    weather_str += f"\n {day_local} {self.month_lst[month_local_num - 1]} {year_str} года\n{'-'*40}\n"
+                    weather_str += f"\n {day_local} {MONTH_LST[month_local_num - 1]} {year_str} года\n{'-'*40}\n"
                 weather_str += f"{time_local}:00  {str(round(i['main']['temp'], 1))}C " \
                                f"{str(round(i['wind']['speed'], 1))}м/с {self.get_wind_direction(i['wind']['deg'])} " \
                                f"{i['weather'][0]['description']}\n"

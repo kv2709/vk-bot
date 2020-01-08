@@ -3,40 +3,53 @@
 import random
 import json
 import os
+
 TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
 APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
 
+CMD_START = 'Начать'
+CMD_BIYSK_WEATHER_NOW = "Погода в Бийске сегодня"
+CMD_BIYSK_WEATHER_FORECAST = "Прогноз по Бийску на 5дн"
+CMD_NOVOSIBIRSK_WEATHER_NOW = "Погода в Нов-ске сегодня"
+CMD_NOVOSIBIRSK_WEATHER_FORECAST = "Прогноз по Нов-ску на 5дн"
+
+BIYSK_ID = 1510018
+NOVOSIBIRSK_ID = 1496747
+
 GROUP_ID = 190385197
-key_board_dict = {"one_time": False,
+
+KEY_BOARD = json.dumps(
+                 {"one_time": False,
                   'buttons': [
                               [{"action": {"type": "text",
-                                           "label": "Погода в Бийске сегодня"
+                                           "label": CMD_BIYSK_WEATHER_NOW
                                            },
                                 "color": "primary"
                                 },
                                {"action": {"type": "text",
-                                           "label": "Прогноз по Бийску на 5дн"
+                                           "label": CMD_BIYSK_WEATHER_FORECAST
                                            },
                                 "color": "primary"
                                 },
                                ],
                               [{"action": {"type": "text",
-                                           "label": "Погода в Нов-ске сегодня"
+                                           "label": CMD_NOVOSIBIRSK_WEATHER_NOW
                                            },
                                 "color": "primary"
                                 },
                                {"action": {"type": "text",
-                                           "label": "Прогноз по Нов-ску на 5дн"
+                                           "label": CMD_NOVOSIBIRSK_WEATHER_FORECAST
                                            },
                                 "color": "primary"
                                 },
                                ]
                              ]
                   }
-KEY_BOARD = json.dumps(key_board_dict)
+                       )
 
-key_board_empty_dict = {"buttons": [], "one_time": True}
-KEY_BOARD_EMPTY = json.dumps(key_board_empty_dict)
+KEY_BOARD_EMPTY = json.dumps({"buttons": [],
+                              "one_time": True}
+                             )
 
 
 def get_random_id():

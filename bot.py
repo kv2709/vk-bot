@@ -2,8 +2,8 @@
 
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-from setup import TOKEN_API, GROUP_ID, KEY_BOARD, get_random_id
 from weather_request import WeatherGetter
+from setup import *
 
 
 class VKBot:
@@ -44,7 +44,7 @@ class VKBot:
         :param event: событие, которое обрабатывает метод
 
         """
-        if event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == 'Начать':
+        if event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_START:
             user_id = event.obj.message['from_id']
             user_info = self.vk_api.users.get(user_id=user_id)
             message_from_bot = f"Уважаемый {user_info[0]['first_name']} {user_info[0]['last_name']}. " \
@@ -55,23 +55,23 @@ class VKBot:
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=user_id,
                                       message=message_from_bot, keyboard=KEY_BOARD)
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == "Погода в Бийске сегодня":
-            message_from_bot = self.weather.get_current_weather(city_id=1510018)
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_BIYSK_WEATHER_NOW:
+            message_from_bot = self.weather.get_current_weather(city_id=BIYSK_ID)
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
                                       message=message_from_bot)
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == "Прогноз по Бийску на 5дн":
-            message_from_bot = self.weather.get_forecast(city_id=1510018)
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_BIYSK_WEATHER_FORECAST:
+            message_from_bot = self.weather.get_forecast(city_id=BIYSK_ID)
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
                                       message=message_from_bot)
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == "Погода в Нов-ске сегодня":
-            message_from_bot = self.weather.get_current_weather(city_id=1496747)
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_NOVOSIBIRSK_WEATHER_NOW:
+            message_from_bot = self.weather.get_current_weather(city_id=NOVOSIBIRSK_ID)
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
                                       message=message_from_bot)
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == "Прогноз по Нов-ску на 5дн":
-            message_from_bot = self.weather.get_forecast(city_id=1496747)
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_NOVOSIBIRSK_WEATHER_FORECAST:
+            message_from_bot = self.weather.get_forecast(city_id=NOVOSIBIRSK_ID)
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
                                       message=message_from_bot)
 

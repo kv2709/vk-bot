@@ -11,17 +11,15 @@ class VKBot:
     Класс бота, обрабатывающий события, полученные в результате
     прослушивания ответов от сервера ВК на LongPoll запросы
     """
-    def __init__(self, token='', group_id=0):
+    def __init__(self):
         """
         Инициализация объекта калсса
-        :param token: Токен доступа к АПИ ВК, полученный из переменной окружения Heroku
-                      Определен в модуле setup
-        :param group_id: номер сообщества бота. Определен в модуле setup
+        TOKEN_API: Токен доступа к АПИ ВК, полученный из переменной окружения Heroku
+                   Определен в модуле setup
+        GROUP_ID: номер сообщества бота. Определен в модуле setup
         """
-        self.token = token
-        self.group_id = group_id
-        self.vk_api_obj = vk_api.VkApi(token=self.token)
-        self.vk_bot_pollster = VkBotLongPoll(vk=self.vk_api_obj, group_id=self.group_id)
+        self.vk_api_obj = vk_api.VkApi(token=TOKEN_API)
+        self.vk_bot_pollster = VkBotLongPoll(vk=self.vk_api_obj, group_id=GROUP_ID)
         self.vk_api = self.vk_api_obj.get_api()
         self.weather = WeatherGetter()
 
@@ -90,5 +88,5 @@ class VKBot:
 
 
 if __name__ == '__main__':
-    bot = VKBot(token=TOKEN_API, group_id=GROUP_ID)
+    bot = VKBot()
     bot.run()

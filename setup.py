@@ -12,9 +12,17 @@ CMD_BIYSK_WEATHER_NOW = "Погода в Бийске сегодня"
 CMD_BIYSK_WEATHER_FORECAST = "Прогноз по Бийску на 5дн"
 CMD_NOVOSIBIRSK_WEATHER_NOW = "Погода в Нов-ске сегодня"
 CMD_NOVOSIBIRSK_WEATHER_FORECAST = "Прогноз по Нов-ску на 5дн"
+CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW = "Погода на трассе Бск-Нск"
+CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW = "Погода на трассе Бск-ЧТ"
+CMD_MENU_ROAD_FORECAST = "Меню погоды по Чуйскому тракту"
 
-BIYSK_ID = 1510018
 NOVOSIBIRSK_ID = 1496747
+CHEREPANOVO_ID = 1508161
+TALMENKA_ID = 1490266
+NOVOALTAYSK_ID = 1497173
+NALOBIKHA_ID = 1498027
+TROITSKOYE_ID = 1489209
+BIYSK_ID = 1510018
 
 GROUP_ID = 190385197
 
@@ -39,6 +47,31 @@ KEY_BOARD = json.dumps(
                                 },
                                {"action": {"type": "text",
                                            "label": CMD_NOVOSIBIRSK_WEATHER_FORECAST
+                                           },
+                                "color": "primary"
+                                },
+                               ],
+                              [{"action": {"type": "text",
+                                           "label": CMD_MENU_ROAD_FORECAST
+                                           },
+                                "color": "primary"
+                                },
+                               ]
+                              ]
+                  }
+                       )
+
+KEY_BOARD_ROAD = json.dumps(
+                 {"one_time": False,
+                  'buttons': [
+                              [{"action": {"type": "text",
+                                           "label": CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW
+                                           },
+                                "color": "primary"
+                                },
+                               ],
+                              [{"action": {"type": "text",
+                                           "label": CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW
                                            },
                                 "color": "primary"
                                 },

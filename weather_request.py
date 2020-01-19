@@ -54,13 +54,14 @@ class WeatherGetter:
                                                     'APPID': APP_ID})
             data = res.json()
             now_dt = datetime.datetime.utcfromtimestamp(data['dt']) + datetime.timedelta(hours=7)
-            now_str = f"{str(now_dt.day)} {MONTH_LST[now_dt.month - 1]} {str(now_dt.year)} года " \
+            now_str = f"{data['name']} \n" \
+                      f"{str(now_dt.day)} {MONTH_LST[now_dt.month - 1]} {str(now_dt.year)} года " \
                       f"{str(now_dt.hour).zfill(2)}:{str(now_dt.minute).zfill(2)}"
 
             weather_str = now_str + f"\n темп: {str(round(data['main']['temp'], 1))}C  " \
                                     f"ветер: {str(round(data['wind']['speed'], 1))}м/с " \
                                     f"{self.get_wind_direction(data['wind']['deg'])} \n " \
-                                    f"{data['weather'][0]['description']}"
+                                    f"{data['weather'][0]['description']} \n"
 
         except Exception as e:
             weather_str = "Exception: " + str(e)
@@ -98,4 +99,10 @@ class WeatherGetter:
 
         except Exception as e:
             weather_str = "Exception: " + str(e)
+        return weather_str
+
+    def get_current_weather_for_city_list(self, *args):
+        weather_str = ""
+        for arg in args:
+            weather_str += self.get_current_weather(city_id=arg)
         return weather_str

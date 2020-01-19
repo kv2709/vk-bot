@@ -52,6 +52,25 @@ class VKBot:
                                f" показывать прогноз погоды в Бийске и Новосибирске на сегодня и на пять дней"
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=user_id,
                                       message=message_from_bot, keyboard=KEY_BOARD)
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_MENU_ROAD_FORECAST:
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+                                      message="", keyboard=KEY_BOARD_EMPTY)
+            message_from_bot = "Загружено дорожное меню"
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+                                      message=message_from_bot, keyboard=KEY_BOARD)
+
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == \
+                CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW:
+            message_from_bot = self.weather.get_current_weather_for_city_list(NOVOSIBIRSK_ID,
+                                                                              CHEREPANOVO_ID,
+                                                                              TALMENKA_ID,
+                                                                              NOVOALTAYSK_ID,
+                                                                              NALOBIKHA_ID,
+                                                                              TROITSKOYE_ID,
+                                                                              BIYSK_ID,
+                                                                              )
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+                                      message=message_from_bot)
 
         elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_BIYSK_WEATHER_NOW:
             message_from_bot = self.weather.get_current_weather(city_id=BIYSK_ID)

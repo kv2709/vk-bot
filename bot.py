@@ -52,10 +52,14 @@ class VKBot:
                                f" показывать прогноз погоды в Бийске и Новосибирске на сегодня и на пять дней"
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=user_id,
                                       message=message_from_bot, keyboard=KEY_BOARD)
+
         elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_MENU_ROAD_FORECAST:
-            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
-                                      message="", keyboard=KEY_BOARD_EMPTY)
             message_from_bot = "Загружено дорожное меню"
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+                                      message=message_from_bot, keyboard=KEY_BOARD_ROAD)
+
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_RETURN_MAIN_MENU:
+            message_from_bot = "Загружено основное меню"
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
                                       message=message_from_bot, keyboard=KEY_BOARD)
 

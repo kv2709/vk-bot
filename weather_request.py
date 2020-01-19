@@ -104,5 +104,5 @@ class WeatherGetter:
     def get_current_weather_for_city_list(self, *args):
         weather_str = ""
         for arg in args:
-            weather_str += self.get_current_weather(city_id=arg)
+            weather_str += f"{self.get_current_weather(city_id=arg)}{'-'*50}\n"
         return weather_str

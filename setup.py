@@ -7,6 +7,7 @@ import os
 TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
 APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
 
+
 CMD_START = 'Начать'
 CMD_BIYSK_WEATHER_NOW = "Погода в Бийске сегодня"
 CMD_BIYSK_WEATHER_FORECAST = "Прогноз по Бийску на 5дн"
@@ -15,6 +16,8 @@ CMD_NOVOSIBIRSK_WEATHER_FORECAST = "Прогноз по Нов-ску на 5дн
 CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW = "Погода на трассе Бск-Нск"
 CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW = "Погода на трассе Бск-ЧТ"
 CMD_MENU_ROAD_FORECAST = "Меню погоды по Чуйскому тракту"
+CMD_RETURN_MAIN_MENU = "Вернутся в основное меню"
+
 
 NOVOSIBIRSK_ID = 1496747
 CHEREPANOVO_ID = 1508161
@@ -69,14 +72,19 @@ KEY_BOARD_ROAD = json.dumps(
                                            },
                                 "color": "primary"
                                 },
+                               {"action": {"type": "text",
+                                          "label": CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW
+                                           },
+                               "color": "primary"
+                                },
                                ],
                               [{"action": {"type": "text",
-                                           "label": CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW
+                                           "label": CMD_RETURN_MAIN_MENU
                                            },
                                 "color": "primary"
                                 },
                                ]
-                             ]
+                              ]
                   }
                        )
 

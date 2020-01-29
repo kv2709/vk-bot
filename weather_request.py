@@ -48,23 +48,26 @@ class WeatherGetter:
         состояние(облачность, осадки))
         """
         try:
-            res = requests.get(WEATHER_URL, params={'id': city_id,
+
+            data = requests.get(WEATHER_URL, params={'id': city_id,
                                                     'units': 'metric',
                                                     'lang': 'ru',
-                                                    'APPID': APP_ID})
-            data = res.json()
+                                                    'APPID': APP_ID}).json()
+
+            # data = res.json()
             now_dt = datetime.datetime.utcfromtimestamp(data['dt']) + datetime.timedelta(hours=7)
-            now_str = f"{data['name']} \n" \
+            now_str = f"{data['name']}\n" \
                       f"{str(now_dt.day)} {MONTH_LST[now_dt.month - 1]} {str(now_dt.year)} года " \
                       f"{str(now_dt.hour).zfill(2)}:{str(now_dt.minute).zfill(2)}"
 
-            weather_str = now_str + f"\n темп: {str(round(data['main']['temp'], 1))}C  " \
+            weather_str = now_str + f"\nтемп: {str(round(data['main']['temp'], 1))}C " \
                                     f"ветер: {str(round(data['wind']['speed'], 1))}м/с " \
-                                    f"{self.get_wind_direction(data['wind']['deg'])} \n " \
-                                    f"{data['weather'][0]['description']} \n"
+                                    f"{self.get_wind_direction(data['wind']['deg'])}\n" \
+                                    f"{data['weather'][0]['description']}\n"
 
         except Exception as e:
             weather_str = "Exception: " + str(e)
+
         return weather_str
 
     def get_forecast(self, city_id=0):

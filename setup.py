@@ -4,8 +4,10 @@ import random
 import json
 import os
 
-TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
-APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
+# TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
+# APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
+TOKEN_API = '329cff0dfbb52cda1f3f64a65d9a08cba6313e424121bc94347b4765dc8f65cbdc0dce00d17bd60379ea5'
+APP_ID = '11e15b9843605c694e86fee262a52d86'
 
 
 CMD_START = 'Начать'
@@ -95,6 +97,59 @@ KEY_BOARD_EMPTY = json.dumps({"buttons": [],
 
 def get_random_id():
     return random.getrandbits(31) * random.choice([-1, 1])
+
+
+log_config = {
+    "version": 1,
+    "formatters": {
+        "event_formatter": {
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            "datefmt": "%d-%m-%Y %H:%M:%S",
+        },
+        "bot_formatter": {
+            "format": "%(asctime)s - %(levelname)s - %(message)s",
+            "datefmt": "%d-%m-%Y %H:%M:%S",
+        },
+        "error_bot_formatter": {
+            "format": "%(asctime)s - %(levelname)s - %(message)s",
+            "datefmt": "%d-%m-%Y %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "event_handler": {
+            "class": "logging.FileHandler",
+            "formatter": "event_formatter",
+            "filename": "event.log",
+            "encoding": "UTF-8",
+        },
+        "bot_handler": {
+            "class": "logging.FileHandler",
+            "formatter": "bot_formatter",
+            "filename": "bot.log",
+            "encoding": "UTF-8",
+        },
+        "error_bot_handler": {
+            "class": "logging.FileHandler",
+            "formatter": "error_bot_formatter",
+            "filename": "error_bot.log",
+            "encoding": "UTF-8",
+        },
+    },
+    "loggers": {
+        "event": {
+            "handlers": ["event_handler"],
+            "level": "DEBUG",
+        },
+        "bot": {
+            "handlers": ["bot_handler"],
+            "level": "INFO",
+        },
+        "error_bot": {
+            "handlers": ["error_bot_handler"],
+            "level": "ERROR",
+        },
+    },
+}
 
 
 """

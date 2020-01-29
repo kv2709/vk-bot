@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import vk_api
+from vk_api import VkApi
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from weather_request import WeatherGetter
 from setup import *
+import logging.config
 
 
 class VKBot:
@@ -13,15 +14,18 @@ class VKBot:
     """
     def __init__(self):
         """
-        Инициализация объекта калсса
+        Инициализация объекта класса
         TOKEN_API: Токен доступа к АПИ ВК, полученный из переменной окружения Heroku
                    Определен в модуле setup
         GROUP_ID: номер сообщества бота. Определен в модуле setup
         """
-        self.vk_api_obj = vk_api.VkApi(token=TOKEN_API)
+        self.vk_api_obj = VkApi(token=TOKEN_API)
         self.vk_bot_pollster = VkBotLongPoll(vk=self.vk_api_obj, group_id=GROUP_ID)
         self.vk_api = self.vk_api_obj.get_api()
         self.weather = WeatherGetter()
+        logging.config.dictConfig(log_config)
+        self.event_log = logging.getLogger('event')
+        self.error_log = logging.getLogger('error_bot')
 
     def run(self):
         """
@@ -32,7 +36,7 @@ class VKBot:
             try:
                 self.on_event(event=event)
             except Exception as err:
-                print(err)
+                self.error_log.error(f'Исключение в обработчике событий: {err} listen {self.vk_bot_pollster.listen()}')
 
     def on_event(self, event=None):
         """
@@ -42,8 +46,8 @@ class VKBot:
         :param event: событие, которое обрабатывает метод
 
         """
+        user_id = event.obj.message['from_id']
         if event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_START:
-            user_id = event.obj.message['from_id']
             user_info = self.vk_api.users.get(user_id=user_id)
             message_from_bot = f"Уважаемый {user_info[0]['first_name']} {user_info[0]['last_name']}. " \
                                f"Вас привествует Бот сообщества <Бото-ферма>. Мой Бот умеет отвечать эхом " \
@@ -52,6 +56,8 @@ class VKBot:
                                f" показывать прогноз погоды в Бийске и Новосибирске на сегодня и на пять дней"
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=user_id,
                                       message=message_from_bot, keyboard=KEY_BOARD)
+            self.event_log.info(msg=f"Пользователь {user_info[0]['first_name']} {user_info[0]['last_name']}"
+                                    f" запустил сеанс бота")
 
         elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_MENU_ROAD_FORECAST:
             message_from_bot = "Загружено дорожное меню"
@@ -65,6 +71,7 @@ class VKBot:
 
         elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == \
                 CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW:
+            user_info = self.vk_api.users.get(user_id=user_id, name_case='Gen')
             message_from_bot = self.weather.get_current_weather_for_city_list(NOVOSIBIRSK_ID,
                                                                               CHEREPANOVO_ID,
                                                                               TALMENKA_ID,
@@ -75,6 +82,8 @@ class VKBot:
                                                                               )
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
                                       message=message_from_bot)
+            self.event_log.info(msg=f"Выдана погода по трассе Нск-Бск для "
+                                    f"{user_info[0]['first_name']} {user_info[0]['last_name']}")
 
         elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_BIYSK_WEATHER_NOW:
             message_from_bot = self.weather.get_current_weather(city_id=BIYSK_ID)
@@ -97,7 +106,6 @@ class VKBot:
                                       message=message_from_bot)
 
         elif event.type == VkBotEventType.MESSAGE_NEW:
-            user_id = event.obj.message['from_id']
             user_info = self.vk_api.users.get(user_id=user_id, name_case='Gen')
             user_name = f"{user_info[0]['first_name']} {user_info[0]['last_name']}"
             message_from_bot = f"Эхо-ответ бота на входящее сообщение <{event.obj.message['text']}> от {user_name}"
@@ -108,8 +116,13 @@ class VKBot:
                 message_from_bot += f", переславшего сообщение <{event.obj.message['fwd_messages'][0]['text']}> " \
                                     f"от {user_name_reply}"
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=user_id, message=message_from_bot)
+            self.event_log.info(msg=f"Выдан эхо-ответ на входящее от "
+                                    f"{user_info[0]['first_name']} {user_info[0]['last_name']}")
 
 
 if __name__ == '__main__':
+    logging.config.dictConfig(log_config)
+    bot_log = logging.getLogger('bot')
     bot = VKBot()
+    bot_log.info(f'Запуск Бота {bot}')
     bot.run()

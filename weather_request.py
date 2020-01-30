@@ -49,12 +49,12 @@ class WeatherGetter:
         """
         try:
 
-            data = requests.get(WEATHER_URL, params={'id': city_id,
+            res = requests.get(WEATHER_URL, params={'id': city_id,
                                                     'units': 'metric',
                                                     'lang': 'ru',
-                                                    'APPID': APP_ID}).json()
+                                                    'APPID': APP_ID})
 
-            # data = res.json()
+            data = res.json()
             now_dt = datetime.datetime.utcfromtimestamp(data['dt']) + datetime.timedelta(hours=7)
             now_str = f"{data['name']}\n" \
                       f"{str(now_dt.day)} {MONTH_LST[now_dt.month - 1]} {str(now_dt.year)} года " \

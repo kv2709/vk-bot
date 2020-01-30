@@ -32,6 +32,7 @@ class VKBot:
         Основной метод класса получающий события от лонгпуллера и вызывающий метод
         self.on_event для их обработки
         """
+
         for event in self.vk_bot_pollster.listen():
             try:
                 self.on_event(event=event)
@@ -46,8 +47,9 @@ class VKBot:
         :param event: событие, которое обрабатывает метод
 
         """
-        user_id = event.obj.message['from_id']
-        if event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_START:
+        user_id = event.object.message['from_id']
+
+        if event.type == VkBotEventType.MESSAGE_NEW and event.object.message['text'] == CMD_START:
             user_info = self.vk_api.users.get(user_id=user_id)
             message_from_bot = f"Уважаемый {user_info[0]['first_name']} {user_info[0]['last_name']}. " \
                                f"Вас привествует Бот сообщества <Бото-ферма>. Мой Бот умеет отвечать эхом " \
@@ -59,17 +61,17 @@ class VKBot:
             self.event_log.info(msg=f"Пользователь {user_info[0]['first_name']} {user_info[0]['last_name']}"
                                     f" запустил сеанс бота")
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_MENU_ROAD_FORECAST:
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.object.message['text'] == CMD_MENU_ROAD_FORECAST:
             message_from_bot = "Загружено дорожное меню"
-            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.object.message['from_id'],
                                       message=message_from_bot, keyboard=KEY_BOARD_ROAD)
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_RETURN_MAIN_MENU:
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.object.message['text'] == CMD_RETURN_MAIN_MENU:
             message_from_bot = "Загружено основное меню"
-            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.object.message['from_id'],
                                       message=message_from_bot, keyboard=KEY_BOARD)
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == \
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.object.message['text'] == \
                 CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW:
             user_info = self.vk_api.users.get(user_id=user_id, name_case='Gen')
             message_from_bot = self.weather.get_current_weather_for_city_list(NOVOSIBIRSK_ID,
@@ -80,40 +82,40 @@ class VKBot:
                                                                               TROITSKOYE_ID,
                                                                               BIYSK_ID,
                                                                               )
-            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.object.message['from_id'],
                                       message=message_from_bot)
             self.event_log.info(msg=f"Выдана погода по трассе Нск-Бск для "
                                     f"{user_info[0]['first_name']} {user_info[0]['last_name']}")
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_BIYSK_WEATHER_NOW:
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.object.message['text'] == CMD_BIYSK_WEATHER_NOW:
             message_from_bot = self.weather.get_current_weather(city_id=BIYSK_ID)
-            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.object.message['from_id'],
                                       message=message_from_bot)
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_BIYSK_WEATHER_FORECAST:
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.object.message['text'] == CMD_BIYSK_WEATHER_FORECAST:
             message_from_bot = self.weather.get_forecast(city_id=BIYSK_ID)
-            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.object.message['from_id'],
                                       message=message_from_bot)
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_NOVOSIBIRSK_WEATHER_NOW:
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.object.message['text'] == CMD_NOVOSIBIRSK_WEATHER_NOW:
             message_from_bot = self.weather.get_current_weather(city_id=NOVOSIBIRSK_ID)
-            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.object.message['from_id'],
                                       message=message_from_bot)
 
-        elif event.type == VkBotEventType.MESSAGE_NEW and event.obj.message['text'] == CMD_NOVOSIBIRSK_WEATHER_FORECAST:
+        elif event.type == VkBotEventType.MESSAGE_NEW and event.object.message['text'] == CMD_NOVOSIBIRSK_WEATHER_FORECAST:
             message_from_bot = self.weather.get_forecast(city_id=NOVOSIBIRSK_ID)
-            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.obj.message['from_id'],
+            self.vk_api.messages.send(random_id=get_random_id(), peer_id=event.object.message['from_id'],
                                       message=message_from_bot)
 
         elif event.type == VkBotEventType.MESSAGE_NEW:
             user_info = self.vk_api.users.get(user_id=user_id, name_case='Gen')
             user_name = f"{user_info[0]['first_name']} {user_info[0]['last_name']}"
-            message_from_bot = f"Эхо-ответ бота на входящее сообщение <{event.obj.message['text']}> от {user_name}"
-            if len(event.obj.message['fwd_messages']) > 0:
-                user_id_reply = abs(event.obj.message['fwd_messages'][0]['from_id'])
+            message_from_bot = f"Эхо-ответ бота на входящее сообщение <{event.object.message['text']}> от {user_name}"
+            if len(event.object.message['fwd_messages']) > 0:
+                user_id_reply = abs(event.object.message['fwd_messages'][0]['from_id'])
                 user_info_reply = self.vk_api.users.get(user_id=user_id_reply, name_case='Gen')
                 user_name_reply = f"{user_info_reply[0]['first_name']} {user_info_reply[0]['last_name']}"
-                message_from_bot += f", переславшего сообщение <{event.obj.message['fwd_messages'][0]['text']}> " \
+                message_from_bot += f", переславшего сообщение <{event.object.message['fwd_messages'][0]['text']}> " \
                                     f"от {user_name_reply}"
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=user_id, message=message_from_bot)
             self.event_log.info(msg=f"Выдан эхо-ответ на входящее от "

@@ -1,5 +1,3 @@
-import json
-import time
 import pytest
 from vk_api.bot_longpoll import *
 from vk_api.vk_api import *
@@ -69,23 +67,6 @@ def mock_response_requests_get(monkeypatch):
     monkeypatch.setattr("requests.get", mock_get)
 
 
-# Неиспользованные класс и фикстура для объекта vk_api.VkApi
-# Реализация полной изоляции Бота от работы с внешними источниками данных
-# Слишком сложна и малооправдана
-class MockVkApi:
-    @staticmethod
-    def get_api():
-        return "VkApi"
-
-
-@pytest.fixture()
-def mock_vk_api(monkeypatch):
-    def mock_get_api(*args, **kwargs):
-        return MockVkApi()
-
-    monkeypatch.setattr("vk_api.VkApi", mock_get_api)
-
-
 class MockVkBotLongPoll:
     """
     Класс, подменяющий возвращение значения объестом vk_api.bot_longpoll.VkBotLongPoll
@@ -133,3 +114,21 @@ def mock_long_poll(monkeypatch):
         return MockVkBotLongPoll()
 
     monkeypatch.setattr("vk_api.bot_longpoll.VkBotLongPoll", mock_listen)
+
+# Неиспользованные класс и фикстура для объекта vk_api.VkApi
+# Реализация полной изоляции Бота от работы с внешними источниками данных
+# Слишком сложна и малооправдана
+
+
+class MockVkApi:
+    @staticmethod
+    def get_api():
+        return "VkApi"
+
+
+@pytest.fixture()
+def mock_vk_api(monkeypatch):
+    def mock_get_api(*args, **kwargs):
+        return MockVkApi()
+
+    monkeypatch.setattr("vk_api.VkApi", mock_get_api)

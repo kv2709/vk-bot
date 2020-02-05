@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from weather_request import WeatherGetter, WIND_DIRECT
+# Запуск тестов командой pytest -v -k test_weather_unit.py находясь в текущем каталоге
+from weather_request import WeatherGetter
 import pytest
 
 WIND_DIRECT_TEST = [' С', 'СВ', ' В', 'ЮВ', ' Ю', 'ЮЗ', ' З', 'СЗ']

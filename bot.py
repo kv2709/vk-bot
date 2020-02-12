@@ -38,6 +38,7 @@ class VKBot:
                 self.on_event(event=event)
             except Exception as err:
                 self.error_log.error(f'Исключение в обработчике событий: {err} listen {self.vk_bot_pollster.listen()}')
+                print(err)
 
     def on_event(self, event=None):
         """
@@ -58,6 +59,7 @@ class VKBot:
                                f" показывать прогноз погоды в Бийске и Новосибирске на сегодня и на пять дней"
             self.vk_api.messages.send(random_id=get_random_id(), peer_id=user_id,
                                       message=message_from_bot, keyboard=KEY_BOARD)
+
             self.event_log.info(msg=f"Пользователь {user_info[0]['first_name']} {user_info[0]['last_name']}"
                                     f" запустил сеанс бота")
 

@@ -27,6 +27,7 @@ class VKBot:
         logging.config.dictConfig(log_config)
         self.event_log = logging.getLogger('event')
         self.error_log = logging.getLogger('error_bot')
+        self.message_sending = None
 
     def run(self):
         """
@@ -59,7 +60,7 @@ class VKBot:
                                f"из другого диалога с Вашим комментарием. Из полезной функциональности Бот умеет " \
                                f" показывать прогноз погоды в Бийске и Новосибирске на сегодня и на пять дней"
 
-            self.vk_api_get.messages.send(random_id=get_random_id(), peer_id=user_id,
+            self.message_sending = self.vk_api_get.messages.send(random_id=get_random_id(), peer_id=user_id,
                                           message=message_from_bot, keyboard=KEY_BOARD)
 
             self.event_log.info(msg=f"Пользователь {user_info[0]['first_name']} {user_info[0]['last_name']}"

@@ -39,19 +39,19 @@ def test_create_bot_from_my_bot_class(mock_response_requests_get,
     for event in bot.vk_bot_pollster.listen(cmd=CMD_START):
         bot.on_event(event=event)
     assert event.object['message']['text'] == 'Начать'
+    assert bot.message_sending == 'Стартовое приветствие'
 
-
-@pytest.mark.parametrize(argnames="cmd", argvalues=CMD_LST)
-def test_run_bot_from_my_bot_class(cmd,
-                                   mock_response_requests_get,
-                                   mock_obj_vk_api,
-                                   mock_long_poll,
-                                   mock_vk_api_get,
-                                   mock_users_get_messages_send,
-                                   ):
-    bot = VKBot()
-    event = None
-    for event in bot.vk_bot_pollster.listen(cmd=cmd):
-        bot.on_event(event=event)
-    assert event.object['message']['text'] == CMD_LST_revers.pop()
-
+# @pytest.mark.parametrize(argnames="cmd", argvalues=CMD_LST)
+# def test_run_bot_from_my_bot_class(cmd,
+#                                    mock_response_requests_get,
+#                                    mock_obj_vk_api,
+#                                    mock_long_poll,
+#                                    mock_vk_api_get,
+#                                    mock_users_get_messages_send,
+#                                    ):
+#     bot = VKBot()
+#     event = None
+#     for event in bot.vk_bot_pollster.listen(cmd=cmd):
+#         bot.on_event(event=event)
+#     assert event.object['message']['text'] == CMD_LST_revers.pop()
+#

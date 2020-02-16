@@ -28,28 +28,30 @@ CMD_LST_revers = [CMD_RETURN_MAIN_MENU,
                   CMD_START]
 
 
-def test_create_bot_from_my_bot_class(mock_obj_vk_api,
+def test_create_bot_from_my_bot_class(mock_response_requests_get,
+                                      mock_obj_vk_api,
                                       mock_long_poll,
                                       mock_vk_api_get,
-                                      mock_response_requests_get,
-                                      mock_users_info,
+                                      mock_users_get_messages_send,
                                       ):
     bot = VKBot()
-    print(f"From test==bot.vk_api_obj.get_api()=={bot.vk_api_obj.get_api}")
-
     event = None
-    print(f"From test==bot.vk_bot_pollster.listen=={bot.vk_bot_pollster.listen}")
     for event in bot.vk_bot_pollster.listen(cmd=CMD_START):
-        # print(event.object)
         bot.on_event(event=event)
     assert event.object['message']['text'] == 'Начать'
 
 
-# @pytest.mark.parametrize(argnames="cmd", argvalues=CMD_LST)
-# def test_run_bot_from_my_bot_class(cmd, mock_vk_api, mock_long_poll):
-#     bot = VkBotTest(mock_vk_api=mock_vk_api, mock_long_poll=mock_long_poll)
-#     event = None
-#     for event in bot.vk_bot_pollster.listen(cmd=cmd):
-#         bot.on_event(event=event)
-#     assert event.object['message']['text'] == CMD_LST_revers.pop()
+@pytest.mark.parametrize(argnames="cmd", argvalues=CMD_LST)
+def test_run_bot_from_my_bot_class(cmd,
+                                   mock_response_requests_get,
+                                   mock_obj_vk_api,
+                                   mock_long_poll,
+                                   mock_vk_api_get,
+                                   mock_users_get_messages_send,
+                                   ):
+    bot = VKBot()
+    event = None
+    for event in bot.vk_bot_pollster.listen(cmd=cmd):
+        bot.on_event(event=event)
+    assert event.object['message']['text'] == CMD_LST_revers.pop()
 

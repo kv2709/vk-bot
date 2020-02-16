@@ -149,39 +149,144 @@ def mock_vk_api_get(monkeypatch):
     monkeypatch.setattr("vk_api.VkApi.get_api", mock_get)
 
 
+# -------------------------------------------------------------------------------
 class GetClass:
     """
-    Класс, задающий возможность создаваемому полю
-    переменной этого класса иметь входой параметр user_id
+    Класс, создающий возможность создаваемому полю
+    переменной этого класса иметь входой параметр user_id и name_case
     и возвращать значение value, переданное при создании
     переменной экземпляра этого класса
     """
     def __init__(self, value):
         self.value = value
 
-    def __call__(self, user_id):
+    def __call__(self, user_id, name_case):
         return self.value
 
 
-def get_add(us_inf):
+class SendClass:
+
+    def __init__(self, value):
+        self.value = value
+
+    def __call__(self, random_id, peer_id, message, keyboard):
+        return self.value
+
+
+def get_add(user_info):
+    """
+    Декоратор с входным параметром, внутри которого декорируемой функции
+    добавляется поле(атрибут), который должен принимать входное значение,
+    а эта функция при ее вызове возвращать переданное в декоратор значение
+    :param user_info:
+    :return value:
+    """
     def wrapper(users_func):
-        users_func.get = GetClass(us_inf)
+        users_func.get = GetClass(user_info)
         return users_func
     return wrapper
 
 
-class MockUserInfo:
+def send_add(returned_message):
+    def wrapper(users_func):
+        users_func.send = SendClass(returned_message)
+        return users_func
+    return wrapper
+
+
+class MockUserGetMessagesSend:
 
     @staticmethod
     @get_add([{'first_name': 'Urik', 'last_name': 'Kireev'}, ])
     def users():
         return None
 
+    @staticmethod
+    @send_add('Стартовое приветствие')
+    def messages():
+        return None
+
 
 @pytest.fixture()
-def mock_users_info(monkeypatch):
-    def users_get(*args, **kwargs):
-        return MockUserInfo()
+def mock_users_get_messages_send(monkeypatch):
+    def users_get_messages_send(*args, **kwargs):
+        return MockUserGetMessagesSend()
 
-    monkeypatch.setattr("vk_api.VkApi.get_api", users_get)
+    monkeypatch.setattr("vk_api.VkApi.get_api", users_get_messages_send)
 
+
+# ----------------------------------------------------------------------------
+# class SendClass:
+#
+#     def __init__(self, value):
+#         self.value = value
+#
+#     def __call__(self, random_id, peer_id, message, keyboard):
+#         return self.value
+#
+#
+# def send_add(returned_message):
+#     def wrapper(users_func):
+#         users_func.send = SendClass(returned_message)
+#         return users_func
+#     return wrapper
+#
+#
+# class MockMessagesSend:
+#
+#     @staticmethod
+#     @send_add('Стартовое приветствие')
+#     def messages():
+#         return None
+#
+#
+# @pytest.fixture()
+# def mock_messages_send(monkeypatch):
+#     def messages_send(*args, **kwargs):
+#         return MockMessagesSend()
+#
+#     monkeypatch.setattr("vk_api.VkApi.get_api", messages_send)
+
+
+# class GetClass:
+#     """
+#     Класс, создающий возможность создаваемому полю
+#     переменной этого класса иметь входой параметр user_id и name_case
+#     и возвращать значение value, переданное при создании
+#     переменной экземпляра этого класса
+#     """
+#     def __init__(self, value):
+#         self.value = value
+#
+#     def __call__(self, user_id, name_case):
+#         return self.value
+#
+#
+# def get_add(user_info):
+#     """
+#     Декоратор с входным параметром, внутри которого декорируемой функции
+#     добавляется поле(атрибут), который должен принимать входное значение,
+#     а эта функция при ее вызове возвращать переданное в декоратор значение
+#     :param user_info:
+#     :return value:
+#     """
+#     def wrapper(users_func):
+#         users_func.get = GetClass(user_info)
+#         return users_func
+#     return wrapper
+#
+#
+# class MockUserInfo:
+#
+#     @staticmethod
+#     @get_add([{'first_name': 'Urik', 'last_name': 'Kireev'}, ])
+#     def users():
+#         return None
+#
+#
+# @pytest.fixture()
+# def mock_users_get(monkeypatch):
+#     def users_get(*args, **kwargs):
+#         return MockUserInfo()
+#
+#     monkeypatch.setattr("vk_api.VkApi.get_api", users_get)

@@ -2,6 +2,8 @@ import pytest
 from vk_api.bot_longpoll import *
 from vk_api.vk_api import *
 
+from _pytest.monkeypatch import MonkeyPatch
+
 
 @pytest.fixture(autouse=True, scope='session')
 def footer_session_scope():
@@ -67,6 +69,7 @@ def mock_response_requests_get(monkeypatch):
     monkeypatch.setattr("requests.get", mock_get)
 
 
+# ------------------------------------------------------------------------
 class MockVkBotLongPoll:
     """
     Класс, подменяющий возвращение значения объестом vk_api.bot_longpoll.VkBotLongPoll
@@ -115,20 +118,70 @@ def mock_long_poll(monkeypatch):
 
     monkeypatch.setattr("vk_api.bot_longpoll.VkBotLongPoll", mock_listen)
 
-# Неиспользованные класс и фикстура для объекта vk_api.VkApi
-# Реализация полной изоляции Бота от работы с внешними источниками данных
-# Слишком сложна и малооправдана
 
-
-class MockVkApi:
+# ------------------------------------------------------------------------
+class MockObjVkApi:
     @staticmethod
-    def get_api():
-        return "VkApi"
+    def obj_api():
+        return None
 
 
 @pytest.fixture()
-def mock_vk_api(monkeypatch):
-    def mock_get_api(*args, **kwargs):
+def mock_obj_vk_api(monkeypatch):
+    def mock_obj(*args, **kwargs):
+        return MockObjVkApi()
+
+    monkeypatch.setattr("vk_api.vk_api.VkApi", mock_obj)
+
+
+# ------------------------------------------------------------------------
+class MockVkApi:
+    @staticmethod
+    def get_api():
+        return None
+
+
+@pytest.fixture()
+def mock_vk_api_get(monkeypatch):
+    def mock_get(*args, **kwargs):
         return MockVkApi()
 
-    monkeypatch.setattr("vk_api.VkApi", mock_get_api)
+    monkeypatch.setattr("vk_api.VkApi.get_api", mock_get)
+
+
+class GetClass:
+    """
+    Класс, задающий возможность создаваемому полю
+    переменной этого класса иметь входой параметр user_id
+    и возвращать значение value, переданное при создании
+    переменной экземпляра этого класса
+    """
+    def __init__(self, value):
+        self.value = value
+
+    def __call__(self, user_id):
+        return self.value
+
+
+def get_add(us_inf):
+    def wrapper(users_func):
+        users_func.get = GetClass(us_inf)
+        return users_func
+    return wrapper
+
+
+class MockUserInfo:
+
+    @staticmethod
+    @get_add([{'first_name': 'Urik', 'last_name': 'Kireev'}, ])
+    def users():
+        return None
+
+
+@pytest.fixture()
+def mock_users_info(monkeypatch):
+    def users_get(*args, **kwargs):
+        return MockUserInfo()
+
+    monkeypatch.setattr("vk_api.VkApi.get_api", users_get)
+

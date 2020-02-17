@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 # Запуск тестов командой pytest -v -k test_bot.py находясь в текущем каталоге func
 
-from vk_api.bot_longpoll import VkBotLongPoll
 from setup import *
 from bot import VKBot
-import vk_api
 import pytest
 
 CMD_LST = [None,

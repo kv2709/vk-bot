@@ -53,7 +53,7 @@ class VKBot:
 
         if event.type == VkBotEventType.MESSAGE_NEW and event.object.message['text'] == CMD_START:
             user_id = event.object.message['from_id']
-            self.user_info = self.vk_api_get.users.get(user_id=user_id)
+            self.user_info = self.vk_api_get.users.get(user_id=user_id, name_case='Nom')
             first_last_name = f"{self.user_info[0]['first_name']} {self.user_info[0]['last_name']}"
             message_from_bot = f"Уважаемый(ая) {first_last_name}. " \
                                f"Вас привествует Бот сообщества <Бото-ферма>. Мой Бот умеет отвечать эхом " \

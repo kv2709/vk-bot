@@ -4,10 +4,10 @@ import random
 import json
 import os
 
-# TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
-# APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
-TOKEN_API = "test"
-APP_ID = "test"
+TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
+APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
+# TOKEN_API = "test"
+# APP_ID = "test"
 
 
 CMD_START = 'Начать'

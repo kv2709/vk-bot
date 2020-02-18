@@ -16,11 +16,9 @@ def test_create_bot_from_my_bot_class(mock_response_requests_get,
                                       mock_users_get_messages_send,
                                       ):
     bot = VKBot()
-    event = None
-
-    for event in bot.vk_bot_pollster.listen(cmd=CMD_START):
-        bot.on_event_from_dict(event=event)
-    assert event.object['message']['text'] == 'Начать'
+    for bot.event in bot.vk_bot_pollster.listen(cmd=CMD_START):
+        bot.on_event_from_dict()
+    assert bot.event.object['message']['text'] == 'Начать'
     assert bot.user_info[0]['first_name'] == 'Urik'
     assert bot.message_send_exec_code == 600
 
@@ -34,8 +32,7 @@ def test_run_bot_from_my_bot_class(cmd,
                                    mock_users_get_messages_send,
                                    ):
     bot = VKBot()
-    event = None
-    for event in bot.vk_bot_pollster.listen(cmd=cmd):
-        bot.on_event_from_dict(event=event)
-    assert event.object['message']['text'] == CMD_LST_revers.pop()
+    for bot.event in bot.vk_bot_pollster.listen(cmd=cmd):
+        bot.on_event_from_dict()
+    assert bot.event.object['message']['text'] == CMD_LST_revers.pop()
     assert bot.message_send_exec_code == 600

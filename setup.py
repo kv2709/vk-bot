@@ -4,12 +4,15 @@ import random
 import json
 import os
 
-TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
-APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
+TOKEN_API = "329cff0dfbb52cda1f3f64a65d9a08cba6313e424121bc94347b4765dc8f65cbdc0dce00d17bd60379ea5"
+APP_ID = "11e15b9843605c694e86fee262a52d86"
+
+# TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
+# APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
 # TOKEN_API = "test"
 # APP_ID = "test"
 
-
+CMD_NO_COMMAND = None
 CMD_START = 'Начать'
 CMD_BIYSK_WEATHER_NOW = "Погода в Бийске сегодня"
 CMD_BIYSK_WEATHER_FORECAST = "Прогноз по Бийску на 5дн"
@@ -19,6 +22,17 @@ CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW = "Погода на трассе Бск-
 CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW = "Погода на трассе Бск-ЧТ"
 CMD_MENU_ROAD_FORECAST = "Меню погоды по Чуйскому тракту"
 CMD_RETURN_MAIN_MENU = "Вернутся в основное меню"
+
+CMD_LST = [CMD_NO_COMMAND,
+           CMD_START,
+           CMD_BIYSK_WEATHER_NOW,
+           CMD_BIYSK_WEATHER_FORECAST,
+           CMD_NOVOSIBIRSK_WEATHER_NOW,
+           CMD_NOVOSIBIRSK_WEATHER_FORECAST,
+           CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW,
+           CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW,
+           CMD_MENU_ROAD_FORECAST,
+           CMD_RETURN_MAIN_MENU]
 
 
 NOVOSIBIRSK_ID = 1496747

@@ -5,27 +5,8 @@ from setup import *
 from bot import VKBot
 import pytest
 
-CMD_LST = [None,
-           CMD_START,
-           CMD_BIYSK_WEATHER_NOW,
-           CMD_BIYSK_WEATHER_FORECAST,
-           CMD_NOVOSIBIRSK_WEATHER_NOW,
-           CMD_NOVOSIBIRSK_WEATHER_FORECAST,
-           CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW,
-           CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW,
-           CMD_MENU_ROAD_FORECAST,
-           CMD_RETURN_MAIN_MENU]
-
-CMD_LST_revers = [CMD_RETURN_MAIN_MENU,
-                  CMD_MENU_ROAD_FORECAST,
-                  CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW,
-                  CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW,
-                  CMD_NOVOSIBIRSK_WEATHER_FORECAST,
-                  CMD_NOVOSIBIRSK_WEATHER_NOW,
-                  CMD_BIYSK_WEATHER_FORECAST,
-                  CMD_BIYSK_WEATHER_NOW,
-                  CMD_START,
-                  None]
+CMD_LST_revers = CMD_LST.copy()
+CMD_LST_revers.reverse()
 
 
 def test_create_bot_from_my_bot_class(mock_response_requests_get,
@@ -36,8 +17,9 @@ def test_create_bot_from_my_bot_class(mock_response_requests_get,
                                       ):
     bot = VKBot()
     event = None
+
     for event in bot.vk_bot_pollster.listen(cmd=CMD_START):
-        bot.on_event(event=event)
+        bot.on_event_from_dict(event=event)
     assert event.object['message']['text'] == 'Начать'
     assert bot.user_info[0]['first_name'] == 'Urik'
     assert bot.message_send_exec_code == 600
@@ -54,6 +36,6 @@ def test_run_bot_from_my_bot_class(cmd,
     bot = VKBot()
     event = None
     for event in bot.vk_bot_pollster.listen(cmd=cmd):
-        bot.on_event(event=event)
+        bot.on_event_from_dict(event=event)
     assert event.object['message']['text'] == CMD_LST_revers.pop()
     assert bot.message_send_exec_code == 600

@@ -1,11 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import random
-import json
 import os
+import json
+import logging
+import time
 
-TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
-APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
+import requests
+
+
+# TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
+# APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
+TOKEN_API = "329cff0dfbb52cda1f3f64a65d9a08cba6313e424121bc94347b4765dc8f65cbdc0dce00d17bd60379ea5"
+APP_ID = "11e15b9843605c694e86fee262a52d86"
+
 
 CMD_NO_COMMAND = None
 CMD_START = 'Начать'
@@ -84,7 +92,7 @@ KEY_BOARD_ROAD = json.dumps(
                                 "color": "primary"
                                 },
                                {"action": {"type": "text",
-                                          "label": CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW
+                                           "label": CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW
                                            },
                                "color": "primary"
                                 },
@@ -108,11 +116,37 @@ def get_random_id():
     return random.getrandbits(31) * random.choice([-1, 1])
 
 
+class HTTPHandlerDB(logging.Handler):
+
+    def __init__(self):
+        super().__init__()
+        self.content_request = None
+        self.status_code_request = None
+
+    def emit(self, record):
+        date_fmt = '%d-%m-%Y %H:%M:%S'
+        time_created_log = time.strftime(date_fmt, time.localtime(record.created))
+        url = 'https://db-for-logging-vkbot.herokuapp.com/api/log/'
+        dict_for_send = {'time_created': time_created_log,
+                         'logger_name': record.name,
+                         'level_name': record.levelname,
+                         'file_name': record.filename,
+                         'func_name': record.funcName,
+                         'line_number': str(record.lineno),
+                         'msg': record.msg}
+        request_result = requests.post(url=url,
+                                       data=json.dumps(dict_for_send),
+                                       headers={"Content-type": "application/json"})
+        self.content_request = request_result.content
+        self.status_code_request = request_result.status_code
+        return self.content_request
+
+
 log_config = {
     "version": 1,
     "formatters": {
         "event_formatter": {
-            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(filename)s - %(funcName)s - %(lineno)d - %(message)s",
             "datefmt": "%d-%m-%Y %H:%M:%S",
         },
         "bot_formatter": {
@@ -120,11 +154,14 @@ log_config = {
             "datefmt": "%d-%m-%Y %H:%M:%S",
         },
         "error_bot_formatter": {
-            "format": "%(asctime)s - %(levelname)s - %(message)s",
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(filename)s - %(funcName)s - %(lineno)d - %(message)s",
             "datefmt": "%d-%m-%Y %H:%M:%S",
         },
     },
     "handlers": {
+        "event_http_handler": {
+            "class": "setup.HTTPHandlerDB",
+        },
         "event_handler": {
             "class": "logging.FileHandler",
             "formatter": "event_formatter",
@@ -145,6 +182,10 @@ log_config = {
         },
     },
     "loggers": {
+        "event_http": {
+            "handlers": ["event_http_handler"],
+            "level": "DEBUG",
+        },
         "event": {
             "handlers": ["event_handler"],
             "level": "DEBUG",

@@ -58,6 +58,28 @@ def mock_response_requests_get(monkeypatch):
 
 
 # ------------------------------------------------------------------------
+class MockResponseContent:
+    """
+    Класс, подменяющий возвращение значения метода requests.post()
+    через свой атрибут content
+    """
+    content = {"code_error": "Created_new_log_record_from_pytest"}
+    status_code = 2000
+
+
+@pytest.fixture()
+def mock_response_requests_post(monkeypatch):
+    """
+    Фикстура mock_post() будет возвращать мокнутый объект,
+    который имеет единственным атрибутом content
+    """
+    def mock_post(*args, **kwargs):
+        return MockResponseContent()
+
+    monkeypatch.setattr("requests.post", mock_post)
+
+
+# ------------------------------------------------------------------------
 class MockVkBotLongPoll:
     """
     Класс, подменяющий возвращение значения объестом vk_api.bot_longpoll.VkBotLongPoll

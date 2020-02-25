@@ -25,9 +25,10 @@ class VKBot:
         self.vk_api_get = self.vk_api_obj.get_api()
         self.weather = WeatherGetter()
         logging.config.dictConfig(log_config)
-        self.event_log = logging.getLogger('event')
+        self.event_log_http = logging.getLogger('event_http')
         self.error_log = logging.getLogger('error_bot')
         self.message_send_exec_code = None
+        self.log_send_status_code = None
         self.user_info = None
         self.user_id = None
         self.event = None
@@ -43,6 +44,7 @@ class VKBot:
             CMD_NOVOSIBIRSK_WEATHER_NOW: self.cmd_novosibirsk_weather_now,
             CMD_NOVOSIBIRSK_WEATHER_FORECAST: self.cmd_novosibirsk_weather_forecast,
                                     }
+        self.event_log_http.debug(msg=f"Произведен запуск бота {self.__class__}")
 
     def cmd_start(self):
         self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Nom')
@@ -58,9 +60,10 @@ class VKBot:
                                                                     message=message_from_bot,
                                                                     keyboard=KEY_BOARD)
 
-        self.event_log.info(msg=f"Пользователь {first_last_name} запустил новый сеанс бота"
-                                f"Отправка сообщения завершена с кодом "
-                                f"{self.message_send_exec_code}")
+        self.log_send_status_code = self.event_log_http.handlers[0].status_code_request
+        self.event_log_http.debug(msg=f"Пользователь {first_last_name} запустил новый сеанс бота. "
+                                      f"Отправка сообщения завершена с кодом "
+                                      f"{self.message_send_exec_code}")
 
     def no_command(self):
         self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Gen')
@@ -77,10 +80,14 @@ class VKBot:
                                                                     peer_id=self.user_id,
                                                                     message=message_from_bot,
                                                                     keyboard=KEY_BOARD)
-        self.event_log.info(msg=f"Выдан эхо-ответ на входящее от "
-                                f"{first_last_name} "
-                                f"Отправка сообщения завершена с кодом "
-                                f"{self.message_send_exec_code}")
+        self.event_log_http.debug(msg=f"Выдан эхо-ответ на входящее "
+                                      f"<{self.event.object.message['text']}> от "
+                                      f"{first_last_name}. "
+                                      f"Отправка сообщения завершена с кодом "
+                                      f"{self.message_send_exec_code}")
+        self.log_send_status_code = self.event_log_http.handlers[0].status_code_request
+        if self.log_send_status_code != 200:
+            self.error_log.error(msg=f"Запись лога в БД не произведена! Статус код {self.log_send_status_code}")
 
     def cmd_menu_road_forecast(self):
         message_from_bot = "Загружено дорожное меню"
@@ -111,10 +118,10 @@ class VKBot:
                                                                     peer_id=self.user_id,
                                                                     message=message_from_bot,
                                                                     keyboard=KEY_BOARD_ROAD)
-        self.event_log.info(msg=f"Выдана погода по трассе Нск-Бск для "
-                                f"{first_last_name} "
-                                f"Отправка сообщения завершена с кодом "
-                                f"{self.message_send_exec_code}")
+        self.event_log_http.debug(msg=f"Выдана погода по трассе Нск-Бск для "
+                                      f"{first_last_name}. "
+                                      f"Отправка сообщения завершена с кодом "
+                                      f"{self.message_send_exec_code}")
 
     def cmd_biysk_kosh_agach_road_weather_now(self):
         self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Gen')
@@ -124,10 +131,10 @@ class VKBot:
                                                                     peer_id=self.user_id,
                                                                     message=message_from_bot,
                                                                     keyboard=KEY_BOARD_ROAD)
-        self.event_log.info(msg=f"Функция в разработке: погода по трассе Бск-Кош-Агач для "
-                                f"{first_last_name} "
-                                f"Отправка сообщения завершена с кодом "
-                                f"{self.message_send_exec_code}")
+        self.event_log_http.debug(msg=f"Функция в разработке: погода по трассе Бск-Кош-Агач для "
+                                      f"{first_last_name}. "
+                                      f"Отправка сообщения завершена с кодом "
+                                      f"{self.message_send_exec_code}")
 
     def cmd_biysk_weather_now(self):
         message_from_bot = self.weather.get_current_weather(city_id=BIYSK_ID)
@@ -171,16 +178,14 @@ class VKBot:
                 self.error_log.error(f'Исключение в обработчике событий: {err} тип события {self.event.type}')
 
     def on_event_from_dict(self):
-        command_event = self.event.object.message['text']
-        if command_event not in CMD_LST:
-            command_event = CMD_NO_COMMAND
         self.user_id = self.event.object.message['from_id']
-        self.execute_command_dict[command_event]()
+        command_event = self.event.object.message['text']
+        if command_event in self.execute_command_dict:
+            self.execute_command_dict[command_event]()
+        else:
+            self.no_command()
 
 
 if __name__ == '__main__':
-    logging.config.dictConfig(log_config)
-    bot_log = logging.getLogger('bot')
     bot = VKBot()
-    bot_log.info(f'Запуск Бота {bot}')
     bot.run()

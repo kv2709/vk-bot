@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Запуск тестов командой pytest -v -k test_weather_unit.py находясь в текущем каталоге
 from weather_request import WeatherGetter
 import pytest
@@ -29,4 +28,3 @@ def test_get_current_weather_for_city_list(mock_response_requests_get):
     assert weather_str == f"Бийск\n28 января 2020 года 17:28\nтемп: -3.0C ветер: 3.8м/с ЮЗ\nпасмурно\n{'-'*50}\n" \
                           f"Бийск\n28 января 2020 года 17:28\nтемп: -3.0C ветер: 3.8м/с ЮЗ\nпасмурно\n{'-'*50}\n" \
                           f"Бийск\n28 января 2020 года 17:28\nтемп: -3.0C ветер: 3.8м/с ЮЗ\nпасмурно\n{'-'*50}\n"
-

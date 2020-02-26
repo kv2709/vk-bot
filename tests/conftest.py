@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pytest
 from vk_api.bot_longpoll import *
 from vk_api.vk_api import *

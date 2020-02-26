@@ -55,4 +55,3 @@ def test_run_bot_from_my_bot_class(cmd,
         bot.on_event_from_dict()
     assert bot.event.object['message']['text'] == CMD_LST_revers.pop()
     assert bot.message_send_exec_code == 600
-

@@ -32,6 +32,9 @@ class VKBot:
         self.user_info = None
         self.user_id = None
         self.event = None
+        self.status_bot_sing_up_conf = False
+        self.user_states = dict()
+
         self.execute_command_dict = {
             CMD_NO_COMMAND: self.no_command,
             CMD_START: self.cmd_start,
@@ -43,6 +46,7 @@ class VKBot:
             CMD_BIYSK_WEATHER_FORECAST: self.cmd_biysk_weather_forecast,
             CMD_NOVOSIBIRSK_WEATHER_NOW: self.cmd_novosibirsk_weather_now,
             CMD_NOVOSIBIRSK_WEATHER_FORECAST: self.cmd_novosibirsk_weather_forecast,
+            CMD_SIGN_UP_FOR_CONFERENCE: self.cmd_sign_up_for_conference,
                                     }
         self.event_log_http.debug(msg=f"Произведен запуск бота {self.__class__}")
 
@@ -66,28 +70,31 @@ class VKBot:
                                       f"{self.message_send_exec_code}")
 
     def no_command(self):
-        self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Gen')
-        first_last_name = f"{self.user_info[0]['first_name']} {self.user_info[0]['last_name']}"
-        message_from_bot = f"Эхо-ответ бота на входящее сообщение " \
-                           f"<{self.event.object.message['text']}> от {first_last_name}"
-        if len(self.event.object.message['fwd_messages']) > 0:
-            user_id_reply = abs(self.event.object.message['fwd_messages'][0]['from_id'])
-            user_info_reply = self.vk_api_get.users.get(user_id=user_id_reply, name_case='Gen')
-            first_last_name_reply = f"{user_info_reply[0]['first_name']} {user_info_reply[0]['last_name']}"
-            message_from_bot += f", переславшего сообщение <{self.event.object.message['fwd_messages'][0]['text']}> " \
-                                f"от {first_last_name_reply}"
-        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                    peer_id=self.user_id,
-                                                                    message=message_from_bot,
-                                                                    keyboard=KEY_BOARD)
-        self.event_log_http.debug(msg=f"Выдан эхо-ответ на входящее "
-                                      f"<{self.event.object.message['text']}> от "
-                                      f"{first_last_name}. "
-                                      f"Отправка сообщения завершена с кодом "
-                                      f"{self.message_send_exec_code}")
-        self.log_send_status_code = self.event_log_http.handlers[0].status_code_request
-        if self.log_send_status_code != 200:
-            self.error_log.error(msg=f"Запись лога в БД не произведена! Статус код {self.log_send_status_code}")
+        if not self.status_bot_sing_up_conf:
+            self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Gen')
+            first_last_name = f"{self.user_info[0]['first_name']} {self.user_info[0]['last_name']}"
+            message_from_bot = f"Эхо-ответ бота на входящее сообщение " \
+                               f"<{self.event.object.message['text']}> от {first_last_name}"
+            if len(self.event.object.message['fwd_messages']) > 0:
+                user_id_reply = abs(self.event.object.message['fwd_messages'][0]['from_id'])
+                user_info_reply = self.vk_api_get.users.get(user_id=user_id_reply, name_case='Gen')
+                first_last_name_reply = f"{user_info_reply[0]['first_name']} {user_info_reply[0]['last_name']}"
+                message_from_bot += f", переславшего сообщение <{self.event.object.message['fwd_messages'][0]['text']}> " \
+                                    f"от {first_last_name_reply}"
+            self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
+                                                                        peer_id=self.user_id,
+                                                                        message=message_from_bot,
+                                                                        keyboard=KEY_BOARD)
+            self.event_log_http.debug(msg=f"Выдан эхо-ответ на входящее "
+                                          f"<{self.event.object.message['text']}> от "
+                                          f"{first_last_name}. "
+                                          f"Отправка сообщения завершена с кодом "
+                                          f"{self.message_send_exec_code}")
+            self.log_send_status_code = self.event_log_http.handlers[0].status_code_request
+            if self.log_send_status_code != 200:
+                self.error_log.error(msg=f"Запись лога в БД не произведена! Статус код {self.log_send_status_code}")
+        else:
+            self.cmd_sign_up_for_conference()
 
     def cmd_menu_road_forecast(self):
         message_from_bot = "Загружено дорожное меню"
@@ -97,6 +104,7 @@ class VKBot:
                                                                     keyboard=KEY_BOARD_ROAD)
 
     def cmd_return_main_menu(self):
+        self.status_bot_sing_up_conf = False
         message_from_bot = "Загружено основное меню"
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
@@ -163,6 +171,22 @@ class VKBot:
                                                                     peer_id=self.user_id,
                                                                     message=message_from_bot,
                                                                     keyboard=KEY_BOARD)
+
+    def cmd_sign_up_for_conference(self):
+
+        if not self.status_bot_sing_up_conf:
+            self.status_bot_sing_up_conf = True
+            message_from_bot = "Регистрация на конференцию"
+            self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
+                                                                        peer_id=self.user_id,
+                                                                        message=message_from_bot,
+                                                                        keyboard=KEY_BOARD_RETURN_MAIN_MENU)
+        else:
+            message_from_bot = "Анализируем входящий текст"
+            self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
+                                                                        peer_id=self.user_id,
+                                                                        message=message_from_bot,
+                                                                        keyboard=KEY_BOARD_RETURN_MAIN_MENU)
 
     def run(self):
         """

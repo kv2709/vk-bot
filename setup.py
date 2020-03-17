@@ -7,9 +7,10 @@ import logging
 import time
 import requests
 
-
-TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
-APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
+# TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
+# APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
+TOKEN_API = "329cff0dfbb52cda1f3f64a65d9a08cba6313e424121bc94347b4765dc8f65cbdc0dce00d17bd60379ea5"
+APP_ID = "11e15b9843605c694e86fee262a52d86"
 
 CMD_NO_COMMAND = None
 CMD_START = 'Начать'
@@ -21,6 +22,7 @@ CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW = "Погода на трассе Бск-
 CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW = "Погода на трассе Бск-ЧТ"
 CMD_MENU_ROAD_FORECAST = "Меню погоды по Чуйскому тракту"
 CMD_RETURN_MAIN_MENU = "Вернутся в основное меню"
+CMD_SIGN_UP_FOR_CONFERENCE = 'Запись на конференцию'
 
 CMD_LST = [CMD_NO_COMMAND,
            CMD_START,
@@ -31,8 +33,8 @@ CMD_LST = [CMD_NO_COMMAND,
            CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW,
            CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW,
            CMD_MENU_ROAD_FORECAST,
-           CMD_RETURN_MAIN_MENU]
-
+           CMD_RETURN_MAIN_MENU,
+           CMD_SIGN_UP_FOR_CONFERENCE]
 
 NOVOSIBIRSK_ID = 1496747
 CHEREPANOVO_ID = 1508161
@@ -44,64 +46,131 @@ BIYSK_ID = 1510018
 
 GROUP_ID = 190385197
 
+INTENTS = [
+    {
+        "name": "Дата проведения",
+        "token": ("когда", "сколько", "дат", "как скоро", "время"),
+        "scenario": None,
+        "answer": "Конференция проводится 15 апреля, регитсрация начнется в 10 утра",
+    },
+    {
+        "name": "Место проведения",
+        "token": ("где", "мест", "локация", "адрес"),
+        "scenario": None,
+        "answer": "Конференция пройдет в павильоне 18г в Экспоцентре",
+    },
+    {
+        "name": "Регистрация",
+        "token": ("регистр", "добав", "включ", "запис"),
+        "scenario": "registration",
+        "answer": None,
+    },
+]
+SCENARIO = {
+    "registration": {
+        "first_step": "step1",
+        "steps": {
+            "step1": {
+                "text": "Чтобы зарегистрироваться, введите Ваше имя. Оно будет прописано на бэйджике",
+                "failure_text": "Имя должно состоять из 3-30 букв и дефиса! Поробуйте еще раз",
+                "handler": "handle_name",
+                "next_step": "step2"
+            },
+            "step2": {
+                "text": "Введите e-mail. Мы отправим на него все данные",
+                "failure_text": "Во введенном адресе ошибка! Попробуйте еще раз",
+                "handler": "handle_email",
+                "next_step": "step3"
+            },
+            "step3": {
+                "text": "Спасибо за регистрацию, {name}! Мы отправим на Ваш e-mail {email} билет, распечатайте его",
+                "failure_text": None,
+                "handler": None,
+                "next_step": None
+            },
+        }
+    }
+}
+
+DEFAULT_ANSWER = "Не знаю как Вам ответить. " \
+                 "Могу сказать когда и где пройдет конференция, а так же зарегистрировать Вас. Просто спросите"
+
 KEY_BOARD = json.dumps(
-                 {"one_time": False,
-                  'buttons': [
-                              [{"action": {"type": "text",
-                                           "label": CMD_BIYSK_WEATHER_NOW
-                                           },
-                                "color": "primary"
-                                },
-                               {"action": {"type": "text",
-                                           "label": CMD_BIYSK_WEATHER_FORECAST
-                                           },
-                                "color": "primary"
-                                },
-                               ],
-                              [{"action": {"type": "text",
-                                           "label": CMD_NOVOSIBIRSK_WEATHER_NOW
-                                           },
-                                "color": "primary"
-                                },
-                               {"action": {"type": "text",
-                                           "label": CMD_NOVOSIBIRSK_WEATHER_FORECAST
-                                           },
-                                "color": "primary"
-                                },
-                               ],
-                              [{"action": {"type": "text",
-                                           "label": CMD_MENU_ROAD_FORECAST
-                                           },
-                                "color": "primary"
-                                },
-                               ]
-                              ]
-                  }
-                       )
+    {"one_time": False,
+     'buttons': [
+         [{"action": {"type": "text",
+                      "label": CMD_BIYSK_WEATHER_NOW
+                      },
+           "color": "primary"
+           },
+          {"action": {"type": "text",
+                      "label": CMD_BIYSK_WEATHER_FORECAST
+                      },
+           "color": "primary"
+           },
+          ],
+         [{"action": {"type": "text",
+                      "label": CMD_NOVOSIBIRSK_WEATHER_NOW
+                      },
+           "color": "primary"
+           },
+          {"action": {"type": "text",
+                      "label": CMD_NOVOSIBIRSK_WEATHER_FORECAST
+                      },
+           "color": "primary"
+           },
+          ],
+         [{"action": {"type": "text",
+                      "label": CMD_MENU_ROAD_FORECAST
+                      },
+           "color": "primary"
+           },
+          {"action": {"type": "text",
+                      "label": CMD_SIGN_UP_FOR_CONFERENCE
+                      },
+           "color": "primary"
+           },
+          ]
+     ]
+     }
+)
+
+KEY_BOARD_RETURN_MAIN_MENU = json.dumps(
+    {"one_time": False,
+     'buttons': [
+         [{"action": {"type": "text",
+                      "label": CMD_RETURN_MAIN_MENU
+                      },
+           "color": "primary"
+           },
+          ]
+     ]
+     }
+)
 
 KEY_BOARD_ROAD = json.dumps(
-                 {"one_time": False,
-                  'buttons': [
-                              [{"action": {"type": "text",
-                                           "label": CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW
-                                           },
-                                "color": "primary"
-                                },
-                               {"action": {"type": "text",
-                                           "label": CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW
-                                           },
-                               "color": "primary"
-                                },
-                               ],
-                              [{"action": {"type": "text",
-                                           "label": CMD_RETURN_MAIN_MENU
-                                           },
-                                "color": "primary"
-                                },
-                               ]
-                              ]
-                  }
-                       )
+    {"one_time": False,
+     'buttons': [
+         [{"action": {"type": "text",
+                      "label": CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW
+                      },
+           "color": "primary"
+           },
+          {"action": {"type": "text",
+                      "label": CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW
+                      },
+           "color": "primary"
+           },
+          ],
+         [{"action": {"type": "text",
+                      "label": CMD_RETURN_MAIN_MENU
+                      },
+           "color": "primary"
+           },
+          ]
+     ]
+     }
+)
 
 KEY_BOARD_EMPTY = json.dumps({"buttons": [],
                               "one_time": True}

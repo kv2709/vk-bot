@@ -7,10 +7,8 @@ import logging
 import time
 import requests
 
-# TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
-# APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
-TOKEN_API = "329cff0dfbb52cda1f3f64a65d9a08cba6313e424121bc94347b4765dc8f65cbdc0dce00d17bd60379ea5"
-APP_ID = "11e15b9843605c694e86fee262a52d86"
+TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
+APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
 
 CMD_NO_COMMAND = None
 CMD_START = 'Начать'
@@ -21,7 +19,7 @@ CMD_NOVOSIBIRSK_WEATHER_FORECAST = "Прогноз по Нов-ску на 5дн
 CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW = "Погода на трассе Бск-Нск"
 CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW = "Погода на трассе Бск-ЧТ"
 CMD_MENU_ROAD_FORECAST = "Меню погоды по Чуйскому тракту"
-CMD_RETURN_MAIN_MENU = "Вернутся в основное меню"
+CMD_RETURN_MAIN_MENU = "Вернуться в основное меню"
 CMD_SIGN_UP_FOR_CONFERENCE = 'Запись на конференцию'
 
 CMD_LST = [CMD_NO_COMMAND,
@@ -93,7 +91,8 @@ SCENARIO = {
 }
 
 DEFAULT_ANSWER = "Не знаю как Вам ответить. " \
-                 "Могу сказать когда и где пройдет конференция, а так же зарегистрировать Вас. Просто спросите"
+                 "Могу сказать когда и где пройдет конференция, " \
+                 "а также зарегистрировать Вас. Просто спросите"
 
 KEY_BOARD = json.dumps(
     {"one_time": False,

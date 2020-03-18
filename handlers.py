@@ -2,7 +2,7 @@
 
 import re
 
-re_name = re.compile(r'^[w\-\s]{3,40}$')
+re_name = re.compile(r'^[\w\-\s]{3,40}$')
 re_email = re.compile(r'\b[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+\b')
 
 
@@ -16,7 +16,7 @@ def handle_name(text, context):
 
 
 def handle_email(text, context):
-    matches = re.findall(re_name, text)
+    matches = re.findall(re_email, text)
     if len(matches) > 0:
         context['email'] = matches[0]
         return True

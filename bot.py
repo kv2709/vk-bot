@@ -5,6 +5,16 @@ from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from weather_request import WeatherGetter
 from setup import *
 import logging.config
+import handlers
+
+class UserState:
+    """
+    Сосотояние пользователя внутри сценария
+    """
+    def __init__(self, scenario_name, step_name, context=None):
+        self.scenario_name = scenario_name
+        self.step_name = step_name
+        self.context = context or {}
 
 
 class VKBot:
@@ -182,11 +192,55 @@ class VKBot:
                                                                         message=message_from_bot,
                                                                         keyboard=KEY_BOARD_RETURN_MAIN_MENU)
         else:
-            message_from_bot = "Анализируем входящий текст"
+            text_from_user = self.event.object.message['text']
+            print(text_from_user)
+            if self.user_id in self.user_states:
+                print(self.user_id, self.user_states)
+                message_from_bot = self.continue_scenario(text=text_from_user)
+            else:
+                # search intent
+                for intent in INTENTS:
+                    if any(token in text_from_user for token in intent['tokens']):
+                        # run intent
+                        if intent['answer']:
+                            message_from_bot = intent['answer']
+                        else:
+                            message_from_bot = self.start_scenario(intent['scenario'])
+                        break
+                else:
+                    message_from_bot = DEFAULT_ANSWER
+
             self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                         peer_id=self.user_id,
                                                                         message=message_from_bot,
                                                                         keyboard=KEY_BOARD_RETURN_MAIN_MENU)
+
+    def start_scenario(self, scenario_name):
+        scenario = SCENARIO[scenario_name]
+        first_step = scenario_name['first_step']
+        step = scenario['steps'][first_step]
+        text_to_send = step['text']
+        self.user_states[self.user_id] = UserState(scenario_name=scenario_name, step_name=first_step)
+        return text_to_send
+
+    def continue_scenario(self, text):
+        state = self.user_states[self.user_id]
+        steps = SCENARIO[state.scenario_name]["steps"]
+        step = steps[state.step_name]
+        handler = getattr(handlers, step['handler'])
+        if handler(text=text, context=state.context):
+            next_step = steps[step['next_step']]
+            text_to_send = next_step['text'].format(**state.context)
+            if next_step['next_step']:
+                # swith next step
+                state.step_name = step['next_step']
+            else:
+                # finish scenario
+                self.user_states.pop(self.user_id)
+        else:
+            # retry current step
+            text_to_send = step['failure_text'].format(**state.context)
+        return text_to_send
 
     def run(self):
         """

@@ -114,13 +114,11 @@ def test_bot_for_intents_registration_conference(cmd, scenario_name, step_name, 
                                                  mock_users_get_messages_send,
                                                  ):
     bot = VKBot()
-
     for bot.event in bot.vk_bot_pollster.listen(cmd=cmd):
         bot.status_bot_sing_up_conf = True
         if scenario_name:
             bot.user_states[77209884] = UserState(scenario_name=scenario_name, step_name=step_name, context=context)
         bot.on_event_from_dict()
-
     assert bot.event.object['message']['text'] == REG_CONF_SCENARIO_LST_INPUT_revers.pop()[0]
     assert bot.message_from_bot == REG_CONF_SCENARIO_LST_ANSWER_revers.pop()
     assert bot.message_send_exec_code == 600

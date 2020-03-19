@@ -7,9 +7,10 @@ from setup import *
 import logging.config
 import handlers
 
+
 class UserState:
     """
-    Сосотояние пользователя внутри сценария
+    Состояние пользователя внутри сценария
     """
     def __init__(self, scenario_name, step_name, context=None):
         self.scenario_name = scenario_name
@@ -37,6 +38,7 @@ class VKBot:
         logging.config.dictConfig(log_config)
         self.event_log_http = logging.getLogger('event_http')
         self.error_log = logging.getLogger('error_bot')
+        self.message_from_bot = None
         self.message_send_exec_code = None
         self.log_send_status_code = None
         self.user_info = None
@@ -63,15 +65,15 @@ class VKBot:
     def cmd_start(self):
         self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Nom')
         first_last_name = f"{self.user_info[0]['first_name']} {self.user_info[0]['last_name']}"
-        message_from_bot = f"Уважаемый(ая) {first_last_name}. " \
-                           f"Вас привествует Бот сообщества <Бото-ферма>. Мой Бот умеет отвечать эхом " \
-                           f"на произвольное входящее сообщение, а так же на пересылаемое Вами сообщение " \
-                           f"из другого диалога с Вашим комментарием. Из полезной функциональности Бот умеет " \
-                           f" показывать прогноз погоды в Бийске и Новосибирске на сегодня и на пять дней"
+        self.message_from_bot = f"Уважаемый(ая) {first_last_name}. " \
+                                f"Вас привествует Бот сообщества <Бото-ферма>. Мой Бот умеет отвечать эхом " \
+                                f"на произвольное входящее сообщение, а так же на пересылаемое Вами сообщение " \
+                                f"из другого диалога с Вашим комментарием. Из полезной функциональности Бот умеет " \
+                                f" показывать прогноз погоды в Бийске и Новосибирске на сегодня и на пять дней"
 
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
-                                                                    message=message_from_bot,
+                                                                    message=self.message_from_bot,
                                                                     keyboard=KEY_BOARD)
 
         self.log_send_status_code = self.event_log_http.handlers[0].status_code_request
@@ -83,17 +85,17 @@ class VKBot:
         if not self.status_bot_sing_up_conf:
             self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Gen')
             first_last_name = f"{self.user_info[0]['first_name']} {self.user_info[0]['last_name']}"
-            message_from_bot = f"Эхо-ответ бота на входящее сообщение " \
-                               f"<{self.event.object.message['text']}> от {first_last_name}"
+            self.message_from_bot = f"Эхо-ответ бота на входящее сообщение " \
+                                    f"<{self.event.object.message['text']}> от {first_last_name}"
             if len(self.event.object.message['fwd_messages']) > 0:
                 user_id_reply = abs(self.event.object.message['fwd_messages'][0]['from_id'])
                 user_info_reply = self.vk_api_get.users.get(user_id=user_id_reply, name_case='Gen')
                 first_last_name_reply = f"{user_info_reply[0]['first_name']} {user_info_reply[0]['last_name']}"
-                message_from_bot += f", переславшего сообщение <{self.event.object.message['fwd_messages'][0]['text']}> " \
-                                    f"от {first_last_name_reply}"
+                self.message_from_bot += f", переславшего сообщение <{self.event.object.message['fwd_messages'][0]['text']}> " \
+                                         f"от {first_last_name_reply}"
             self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                         peer_id=self.user_id,
-                                                                        message=message_from_bot,
+                                                                        message=self.message_from_bot,
                                                                         keyboard=KEY_BOARD)
             self.event_log_http.debug(msg=f"Выдан эхо-ответ на входящее "
                                           f"<{self.event.object.message['text']}> от "
@@ -107,24 +109,24 @@ class VKBot:
             self.cmd_sign_up_for_conference()
 
     def cmd_menu_road_forecast(self):
-        message_from_bot = "Загружено дорожное меню"
+        self.message_from_bot = "Загружено дорожное меню"
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
-                                                                    message=message_from_bot,
+                                                                    message=self.message_from_bot,
                                                                     keyboard=KEY_BOARD_ROAD)
 
     def cmd_return_main_menu(self):
         self.status_bot_sing_up_conf = False
-        message_from_bot = "Загружено основное меню"
+        self.message_from_bot = "Загружено основное меню"
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
-                                                                    message=message_from_bot,
+                                                                    message=self.message_from_bot,
                                                                     keyboard=KEY_BOARD)
 
     def cmd_biysk_novosibirsk_road_weather_now(self):
         self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Gen')
         first_last_name = f"{self.user_info[0]['first_name']} {self.user_info[0]['last_name']}"
-        message_from_bot = self.weather.get_current_weather_for_city_list(NOVOSIBIRSK_ID,
+        self.message_from_bot = self.weather.get_current_weather_for_city_list(NOVOSIBIRSK_ID,
                                                                           CHEREPANOVO_ID,
                                                                           TALMENKA_ID,
                                                                           NOVOALTAYSK_ID,
@@ -134,7 +136,7 @@ class VKBot:
                                                                           )
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
-                                                                    message=message_from_bot,
+                                                                    message=self.message_from_bot,
                                                                     keyboard=KEY_BOARD_ROAD)
         self.event_log_http.debug(msg=f"Выдана погода по трассе Нск-Бск для "
                                       f"{first_last_name}. "
@@ -144,10 +146,10 @@ class VKBot:
     def cmd_biysk_kosh_agach_road_weather_now(self):
         self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Gen')
         first_last_name = f"{self.user_info[0]['first_name']} {self.user_info[0]['last_name']}"
-        message_from_bot = 'Функция в разработке'
+        self.message_from_bot = 'Функция в разработке'
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
-                                                                    message=message_from_bot,
+                                                                    message=self.message_from_bot,
                                                                     keyboard=KEY_BOARD_ROAD)
         self.event_log_http.debug(msg=f"Функция в разработке: погода по трассе Бск-Кош-Агач для "
                                       f"{first_last_name}. "
@@ -155,61 +157,61 @@ class VKBot:
                                       f"{self.message_send_exec_code}")
 
     def cmd_biysk_weather_now(self):
-        message_from_bot = self.weather.get_current_weather(city_id=BIYSK_ID)
+        self.message_from_bot = self.weather.get_current_weather(city_id=BIYSK_ID)
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
-                                                                    message=message_from_bot,
+                                                                    message=self.message_from_bot,
                                                                     keyboard=KEY_BOARD)
 
     def cmd_biysk_weather_forecast(self):
-        message_from_bot = self.weather.get_forecast(city_id=BIYSK_ID)
+        self.message_from_bot = self.weather.get_forecast(city_id=BIYSK_ID)
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
-                                                                    message=message_from_bot,
+                                                                    message=self.message_from_bot,
                                                                     keyboard=KEY_BOARD)
 
     def cmd_novosibirsk_weather_now(self):
-        message_from_bot = self.weather.get_current_weather(city_id=NOVOSIBIRSK_ID)
+        self.message_from_bot = self.weather.get_current_weather(city_id=NOVOSIBIRSK_ID)
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
-                                                                    message=message_from_bot,
+                                                                    message=self.message_from_bot,
                                                                     keyboard=KEY_BOARD)
 
     def cmd_novosibirsk_weather_forecast(self):
-        message_from_bot = self.weather.get_forecast(city_id=NOVOSIBIRSK_ID)
+        self.message_from_bot = self.weather.get_forecast(city_id=NOVOSIBIRSK_ID)
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
-                                                                    message=message_from_bot,
+                                                                    message=self.message_from_bot,
                                                                     keyboard=KEY_BOARD)
 
     def cmd_sign_up_for_conference(self):
 
         if not self.status_bot_sing_up_conf:
             self.status_bot_sing_up_conf = True
-            message_from_bot = "Регистрация на конференцию"
+            self.message_from_bot = "Бот переключен в режим <Регистрация на конференцию>"
             self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                         peer_id=self.user_id,
-                                                                        message=message_from_bot,
+                                                                        message=self.message_from_bot,
                                                                         keyboard=KEY_BOARD_RETURN_MAIN_MENU)
         else:
             text_from_user = self.event.object.message['text']
             if self.user_id in self.user_states:
-                message_from_bot = self.continue_scenario(text=text_from_user)
+                self.message_from_bot = self.continue_scenario(text=text_from_user)
             else:
                 # search intent
                 for intent in INTENTS:
-                    if any(token in text_from_user for token in intent['token']):
+                    if any(token in text_from_user.lower() for token in intent['token']):
                         # run intent
                         if intent['answer']:
-                            message_from_bot = intent['answer']
+                            self.message_from_bot = intent['answer']
                         else:
-                            message_from_bot = self.start_scenario(scenario_name=intent['scenario'])
+                            self.message_from_bot = self.start_scenario(scenario_name=intent['scenario'])
                         break
                 else:
-                    message_from_bot = DEFAULT_ANSWER
+                    self.message_from_bot = DEFAULT_ANSWER
             self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                         peer_id=self.user_id,
-                                                                        message=message_from_bot,
+                                                                        message=self.message_from_bot,
                                                                         keyboard=KEY_BOARD_RETURN_MAIN_MENU)
 
     def start_scenario(self, scenario_name):
@@ -233,6 +235,7 @@ class VKBot:
                 state.step_name = step['next_step']
             else:
                 # finish scenario
+                self.event_log_http.info(msg="Зарегистрирован: {name} с адресом {email}".format(**state.context))
                 self.user_states.pop(self.user_id)
         else:
             # retry current step

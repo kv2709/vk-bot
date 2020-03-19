@@ -81,7 +81,7 @@ SCENARIO = {
                 "next_step": "step3"
             },
             "step3": {
-                "text": "Спасибо за регистрацию, {name}! Мы отправим на Ваш e-mail {email} билет, распечатайте его",
+                "text": "Спасибо за регистрацию {name}! Мы отправим на Ваш e-mail {email} билет, распечатайте его",
                 "failure_text": None,
                 "handler": None,
                 "next_step": None
@@ -93,6 +93,41 @@ SCENARIO = {
 DEFAULT_ANSWER = "Не знаю как Вам ответить. " \
                  "Могу сказать когда и где пройдет конференция, " \
                  "а также зарегистрировать Вас. Просто спросите"
+
+# Списки для работы тестов написаны в этом модуле из-за удобства
+# близкого просмотра исходных структур INTENTS и SCENARIO
+REG_CONF_INTENTS_LST_INPUT = [
+    "Привет",
+    "Когда будет проходить конференция",
+    "А где она будет проходить",
+    "Лабуда-лабуда",
+]
+
+REG_CONF_INTENTS_LST_ANSWER = [
+    DEFAULT_ANSWER,
+    INTENTS[0]["answer"],
+    INTENTS[1]["answer"],
+    DEFAULT_ANSWER,
+]
+
+REG_CONF_SCENARIO_LST_INPUT = [
+    ("Зарегистрируй меня", None, None, None),
+    ("КЮ", "registration", "step1", None),
+    ("Юрий-Киреев", "registration", "step1", None),
+    ("kv.gmail.com", "registration", "step2", None),
+    ("kv2709@gmail.com", "registration", "step2", {"name": "Юрий-Киреев"}),
+    ("Лабуда", None, None, None)
+]
+
+REG_CONF_SCENARIO_LST_ANSWER = [
+    SCENARIO["registration"]["steps"]["step1"]["text"],
+    SCENARIO["registration"]["steps"]["step1"]["failure_text"],
+    SCENARIO["registration"]["steps"]["step2"]["text"],
+    SCENARIO["registration"]["steps"]["step2"]["failure_text"],
+    SCENARIO["registration"]["steps"]["step3"]["text"].format(name="Юрий-Киреев", email="kv2709@gmail.com"),
+    DEFAULT_ANSWER,
+]
+# ------------------ конец струтур данных для тестов ------------------------
 
 KEY_BOARD = json.dumps(
     {"one_time": False,

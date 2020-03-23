@@ -95,14 +95,14 @@ def test_bot_for_intents_registration_conference(cmd,
 
 @pytest.mark.parametrize(argnames=("cmd", "scenario_name", "step_name", "context"),
                          argvalues=REG_CONF_SCENARIO_LST_INPUT)
-def test_bot_for_intents_registration_conference(cmd, scenario_name, step_name, context,
-                                                 mock_response_requests_get,
-                                                 mock_response_requests_post,
-                                                 mock_obj_vk_api,
-                                                 mock_long_poll,
-                                                 mock_vk_api_get,
-                                                 mock_users_get_messages_send,
-                                                 ):
+def test_bot_for_scenario_registration_conference(cmd, scenario_name, step_name, context,
+                                                  mock_response_requests_get,
+                                                  mock_response_requests_post,
+                                                  mock_obj_vk_api,
+                                                  mock_long_poll,
+                                                  mock_vk_api_get,
+                                                  mock_users_get_messages_send,
+                                                  ):
     bot = VKBot()
     for bot.event in bot.vk_bot_pollster.listen(cmd=cmd):
         bot.status_bot_sing_up_conf = True

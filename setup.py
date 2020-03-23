@@ -22,17 +22,6 @@ CMD_MENU_ROAD_FORECAST = "Меню погоды по Чуйскому тракт
 CMD_RETURN_MAIN_MENU = "Вернуться в основное меню"
 CMD_SIGN_UP_FOR_CONFERENCE = 'Запись на конференцию'
 
-CMD_LST = [CMD_NO_COMMAND,
-           CMD_START,
-           CMD_BIYSK_WEATHER_NOW,
-           CMD_BIYSK_WEATHER_FORECAST,
-           CMD_NOVOSIBIRSK_WEATHER_NOW,
-           CMD_NOVOSIBIRSK_WEATHER_FORECAST,
-           CMD_BIYSK_NOVOSIBIRSK_ROAD_WEATHER_NOW,
-           CMD_BIYSK_KOSH_AGACH_ROAD_WEATHER_NOW,
-           CMD_MENU_ROAD_FORECAST,
-           CMD_RETURN_MAIN_MENU,
-           CMD_SIGN_UP_FOR_CONFERENCE]
 
 NOVOSIBIRSK_ID = 1496747
 CHEREPANOVO_ID = 1508161
@@ -64,6 +53,7 @@ INTENTS = [
         "answer": None,
     },
 ]
+
 SCENARIO = {
     "registration": {
         "first_step": "step1",
@@ -93,41 +83,6 @@ SCENARIO = {
 DEFAULT_ANSWER = "Не знаю как Вам ответить. " \
                  "Могу сказать когда и где пройдет конференция, " \
                  "а также зарегистрировать Вас. Просто спросите"
-
-# Списки для работы тестов написаны в этом модуле из-за удобства
-# близкого просмотра исходных структур INTENTS и SCENARIO
-REG_CONF_INTENTS_LST_INPUT = [
-    "Привет",
-    "Когда будет проходить конференция",
-    "А где она будет проходить",
-    "Лабуда-лабуда",
-]
-
-REG_CONF_INTENTS_LST_ANSWER = [
-    DEFAULT_ANSWER,
-    INTENTS[0]["answer"],
-    INTENTS[1]["answer"],
-    DEFAULT_ANSWER,
-]
-
-REG_CONF_SCENARIO_LST_INPUT = [
-    ("Зарегистрируй меня", None, None, None),
-    ("КЮ", "registration", "step1", None),
-    ("Юрий-Киреев", "registration", "step1", None),
-    ("kv.gmail.com", "registration", "step2", None),
-    ("kv2709@gmail.com", "registration", "step2", {"name": "Юрий-Киреев"}),
-    ("Лабуда", None, None, None)
-]
-
-REG_CONF_SCENARIO_LST_ANSWER = [
-    SCENARIO["registration"]["steps"]["step1"]["text"],
-    SCENARIO["registration"]["steps"]["step1"]["failure_text"],
-    SCENARIO["registration"]["steps"]["step2"]["text"],
-    SCENARIO["registration"]["steps"]["step2"]["failure_text"],
-    SCENARIO["registration"]["steps"]["step3"]["text"].format(name="Юрий-Киреев", email="kv2709@gmail.com"),
-    DEFAULT_ANSWER,
-]
-# ------------------ конец струтур данных для тестов ------------------------
 
 KEY_BOARD = json.dumps(
     {"one_time": False,

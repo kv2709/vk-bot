@@ -2,8 +2,8 @@
 # Запуск тестов командой pytest -v -k test_weather_unit.py находясь в текущем каталоге
 from weather_request import WeatherGetter
 import pytest
+from tests.test_const import *
 
-WIND_DIRECT_TEST = [' С', 'СВ', ' В', 'ЮВ', ' Ю', 'ЮЗ', ' З', 'СЗ']
 
 wg = WeatherGetter()
 
@@ -20,11 +20,16 @@ def test_wind_direct(wind_deg):
 
 def test_get_current_weather(mock_response_requests_get):
     weather_str = wg.get_current_weather(1)
-    assert weather_str == "Бийск\n28 января 2020 года 17:28\nтемп: -3.0C ветер: 3.8м/с ЮЗ\nпасмурно\n"
+    assert weather_str == EXPECT_ANSWER_WEATHER_STR
 
 
 def test_get_current_weather_for_city_list(mock_response_requests_get):
     weather_str = wg.get_current_weather_for_city_list(1, 2, 3)
-    assert weather_str == f"Бийск\n28 января 2020 года 17:28\nтемп: -3.0C ветер: 3.8м/с ЮЗ\nпасмурно\n{'-'*50}\n" \
-                          f"Бийск\n28 января 2020 года 17:28\nтемп: -3.0C ветер: 3.8м/с ЮЗ\nпасмурно\n{'-'*50}\n" \
-                          f"Бийск\n28 января 2020 года 17:28\nтемп: -3.0C ветер: 3.8м/с ЮЗ\nпасмурно\n{'-'*50}\n"
+    assert weather_str == f"{EXPECT_ANSWER_WEATHER_STR}{'-'*50}\n" \
+                          f"{EXPECT_ANSWER_WEATHER_STR}{'-'*50}\n" \
+                          f"{EXPECT_ANSWER_WEATHER_STR}{'-'*50}\n"
+
+
+def test_get_forecast_weather(mock_response_requests_get_forecast):
+    weather_str = wg.get_forecast(1)
+    assert weather_str == EXPECT_ANSWER_FORECAST_STR

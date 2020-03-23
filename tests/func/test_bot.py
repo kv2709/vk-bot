@@ -1,24 +1,9 @@
 # -*- coding: utf-8 -*-
 # Запуск тестов командой pytest -v -k test_bot.py находясь в текущем каталоге func
 
-from setup import *
 from bot import VKBot, UserState
 import pytest
-
-CMD_LST_revers = CMD_LST.copy()
-CMD_LST_revers.reverse()
-
-REG_CONF_INTENTS_LST_INPUT_revers = REG_CONF_INTENTS_LST_INPUT.copy()
-REG_CONF_INTENTS_LST_INPUT_revers.reverse()
-
-REG_CONF_INTENTS_LST_ANSWER_revers = REG_CONF_INTENTS_LST_ANSWER.copy()
-REG_CONF_INTENTS_LST_ANSWER_revers.reverse()
-
-REG_CONF_SCENARIO_LST_INPUT_revers = REG_CONF_SCENARIO_LST_INPUT.copy()
-REG_CONF_SCENARIO_LST_INPUT_revers.reverse()
-
-REG_CONF_SCENARIO_LST_ANSWER_revers = REG_CONF_SCENARIO_LST_ANSWER.copy()
-REG_CONF_SCENARIO_LST_ANSWER_revers.reverse()
+from tests.test_const import *
 
 
 def test_create_bot_from_my_bot_class(mock_response_requests_get,
@@ -33,6 +18,8 @@ def test_create_bot_from_my_bot_class(mock_response_requests_get,
         bot.on_event_from_dict()
     assert bot.event.object['message']['text'] == 'Начать'
     assert bot.user_info[0]['first_name'] == 'Urik'
+    assert bot.user_info[0]['last_name'] == 'Kireev'
+    assert bot.message_from_bot == CMD_START_ANSWER
     assert bot.message_send_exec_code == 600
     assert bot.log_send_status_code == 2000
 
@@ -49,6 +36,8 @@ def test_bot_for_no_command(mock_response_requests_get,
         bot.on_event_from_dict()
     assert bot.event.object['message']['text'] == CMD_NO_COMMAND
     assert bot.user_info[0]['first_name'] == 'Urik'
+    assert bot.user_info[0]['last_name'] == 'Kireev'
+    assert bot.message_from_bot == CMD_NO_COMMAND_ANSWER
     assert bot.message_send_exec_code == 600
     assert bot.log_send_status_code == 2000
 
@@ -66,6 +55,7 @@ def test_bot_for_list_commands(cmd,
     for bot.event in bot.vk_bot_pollster.listen(cmd=cmd):
         bot.on_event_from_dict()
     assert bot.event.object['message']['text'] == CMD_LST_revers.pop()
+    assert bot.message_from_bot == CMD_LST_ANSWER_revers.pop()
     assert bot.message_send_exec_code == 600
 
 

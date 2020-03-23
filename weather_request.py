@@ -48,11 +48,10 @@ class WeatherGetter:
         состояние(облачность, осадки))
         """
         try:
-
-            res = requests.get(WEATHER_URL, params={'id': city_id,
-                                                    'units': 'metric',
-                                                    'lang': 'ru',
-                                                    'APPID': APP_ID})
+            res = requests.get(url=WEATHER_URL, params={'id': city_id,
+                                                        'units': 'metric',
+                                                        'lang': 'ru',
+                                                        'APPID': APP_ID})
 
             data = res.json()
             now_dt = datetime.datetime.utcfromtimestamp(data['dt']) + datetime.timedelta(hours=7)
@@ -79,10 +78,10 @@ class WeatherGetter:
         """
         weather_str = ""
         try:
-            res = requests.get(FORECAST_URL, params={'id': city_id,
-                                                     'units': 'metric',
-                                                     'lang': 'ru',
-                                                     'APPID': APP_ID})
+            res = requests.get(url=FORECAST_URL, params={'id': city_id,
+                                                         'units': 'metric',
+                                                         'lang': 'ru',
+                                                         'APPID': APP_ID})
             data = res.json()
             count_cycle = 0
             for i in data['list']:

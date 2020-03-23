@@ -127,13 +127,13 @@ class VKBot:
         self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Gen')
         first_last_name = f"{self.user_info[0]['first_name']} {self.user_info[0]['last_name']}"
         self.message_from_bot = self.weather.get_current_weather_for_city_list(NOVOSIBIRSK_ID,
-                                                                          CHEREPANOVO_ID,
-                                                                          TALMENKA_ID,
-                                                                          NOVOALTAYSK_ID,
-                                                                          NALOBIKHA_ID,
-                                                                          TROITSKOYE_ID,
-                                                                          BIYSK_ID,
-                                                                          )
+                                                                               CHEREPANOVO_ID,
+                                                                               TALMENKA_ID,
+                                                                               NOVOALTAYSK_ID,
+                                                                               NALOBIKHA_ID,
+                                                                               TROITSKOYE_ID,
+                                                                               BIYSK_ID,
+                                                                               )
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
                                                                     message=self.message_from_bot,

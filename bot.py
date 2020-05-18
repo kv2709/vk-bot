@@ -229,6 +229,7 @@ class VKBot:
                         break
                 else:
                     self.message_from_bot = DEFAULT_ANSWER
+            print(self.message_from_bot, 'end else in cmd_sign_up_for_conference')
             self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                         peer_id=self.user_id,
                                                                         message=self.message_from_bot,

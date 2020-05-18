@@ -207,10 +207,10 @@ class VKBot:
             #  если она найдена, то берем оттуда остальные значения для self.user_states[self.user_id]
             request_result = requests.get(url=URL_API_DB_USER_STATE + str(self.user_id))
             response = request_result.json()
-            print(response, 'after get', response["user_id"], str(self.user_id))
+            print(response, 'after get')
             # if self.user_id in self.user_states: # заменяем if на проверку наличия в БД записи про этого user_id
 
-            if response["user_id"] == str(self.user_id):
+            if "user_id" in response:
 
                 self.user_states[self.user_id].scenario_name = response["scenario_name"]
                 self.user_states[self.user_id].step_name = response["step_name"]

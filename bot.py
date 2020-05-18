@@ -91,7 +91,8 @@ class VKBot:
                 user_id_reply = abs(self.event.object.message['fwd_messages'][0]['from_id'])
                 user_info_reply = self.vk_api_get.users.get(user_id=user_id_reply, name_case='Gen')
                 first_last_name_reply = f"{user_info_reply[0]['first_name']} {user_info_reply[0]['last_name']}"
-                self.message_from_bot += f", переславшего сообщение <{self.event.object.message['fwd_messages'][0]['text']}> " \
+                self.message_from_bot += f", переславшего сообщение " \
+                                         f"<{self.event.object.message['fwd_messages'][0]['text']}> " \
                                          f"от {first_last_name_reply}"
             self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                         peer_id=self.user_id,
@@ -195,9 +196,27 @@ class VKBot:
                                                                         keyboard=KEY_BOARD_RETURN_MAIN_MENU)
         else:
             text_from_user = self.event.object.message['text']
-            if self.user_id in self.user_states:
+            # TODO Надо получить из базы запросом по ключевому значению user_id (преобразовать в строку) его
+            #  состояние и заполниить поля объекта
+            #  self.user_states[self.user_id] = UserState(scenario_name=scenario_name, step_name=first_step)
+            #  если юзер в Бд найден, мы получем ответом значения полей для self.user_states и присваиваем их ей
+            #  и выполняем продолжение сценария
+            # -----------------------------------------
+            # Получили текст от пользователя, занем его self.user_id
+            #  пошли в базу за за посиком там запили для него и
+            #  если она найдена, то берем оттуда остальные значения для self.user_states[self.user_id]
+            request_result = requests.get(url=URL_API_DB_USER_STATE + str(self.user_id))
+            response = request_result.json()
+            print(response)
+            # if self.user_id in self.user_states: # заменяем if на проверку наличия в БД записи про этого user_id
+            if response["user_id"] == str(self.user_id):
+                self.user_states[self.user_id].scenario_name = response["scenario_name"]
+                self.user_states[self.user_id].step_name = response["step_name"]
+                self.user_states[self.user_id].context = response["context"]
+                # TODO ======================================================================================
                 self.message_from_bot = self.continue_scenario(text=text_from_user)
             else:
+
                 # search intent
                 for intent in INTENTS:
                     if any(token in text_from_user.lower() for token in intent['token']):
@@ -205,6 +224,7 @@ class VKBot:
                         if intent['answer']:
                             self.message_from_bot = intent['answer']
                         else:
+                            # иначе запускаем новый сценарий, добавив в БД новую запись
                             self.message_from_bot = self.start_scenario(scenario_name=intent['scenario'])
                         break
                 else:
@@ -219,10 +239,22 @@ class VKBot:
         first_step = scenario['first_step']
         step = scenario['steps'][first_step]
         text_to_send = step['text']
-        self.user_states[self.user_id] = UserState(scenario_name=scenario_name, step_name=first_step)
+        # TODO Занести в базу новую запись для данного user_id преобразовать в строку
+        self.user_states[self.user_id] = UserState(scenario_name=scenario_name, step_name=first_step, context={})
+        dict_for_send = {'user_id': str(self.user_id),
+                         'scenario_name': self.user_states[self.user_id].scenario_name,
+                         'step_name': self.user_states[self.user_id].step_name,
+                         'context': self.user_states[self.user_id].context
+                         }
+        request_result = requests.post(url=URL_API_DB_USER_STATE,
+                                       data=json.dumps(dict_for_send),
+                                       headers={"Content-type": "application/json"})
+        print(request_result.json())
+        # TODO ======================================================================================
         return text_to_send
 
     def continue_scenario(self, text):
+        # TODO при продолжении сценария мы имеем заполненный, прочитанными из БД полями объект self.user_states
         state = self.user_states[self.user_id]
         steps = SCENARIO[state.scenario_name]["steps"]
         step = steps[state.step_name]
@@ -233,10 +265,25 @@ class VKBot:
             if next_step['next_step']:
                 # swith next step
                 state.step_name = step['next_step']
+                # TODO наверно произвести перезаписть нового состояния в БД
+                dict_for_send = {'user_id': str(self.user_id),
+                                 'scenario_name': self.user_states[self.user_id].scenario_name,
+                                 'step_name': self.user_states[self.user_id].step_name,
+                                 'context': self.user_states[self.user_id].context
+                                 }
+                request_result = requests.put(url=URL_API_DB_USER_STATE + str(self.user_id),
+                                              data=json.dumps(dict_for_send),
+                                              headers={"Content-type": "application/json"})
+                print(request_result.json())
+                # TODO ============================================================
             else:
                 # finish scenario
                 self.event_log_http.info(msg="Зарегистрирован: {name} с адресом {email}".format(**state.context))
+                # TODO Здесь надо удалить запись из БД
                 self.user_states.pop(self.user_id)
+                request_result = requests.delete(url=URL_API_DB_USER_STATE + str(self.user_id))
+                print(request_result.json())
+                # TODO ============================================================
         else:
             # retry current step
             text_to_send = step['failure_text'].format(**state.context)

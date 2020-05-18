@@ -164,6 +164,8 @@ KEY_BOARD_ROAD = json.dumps(
 KEY_BOARD_EMPTY = json.dumps({"buttons": [],
                               "one_time": True}
                              )
+URL_API_DB_USER_STATE = "https://db-for-logging-vkbot.herokuapp.com/api/user_state/"
+URL_API_DB_LOGGING_BOT = 'https://db-for-logging-vkbot.herokuapp.com/api/log/'
 
 
 def get_random_id():
@@ -180,7 +182,6 @@ class HTTPHandlerDB(logging.Handler):
     def emit(self, record):
         date_fmt = '%d-%m-%Y %H:%M:%S'
         time_created_log = time.strftime(date_fmt, time.localtime(record.created))
-        url = 'https://db-for-logging-vkbot.herokuapp.com/api/log/'
         dict_for_send = {'time_created': time_created_log,
                          'logger_name': record.name,
                          'level_name': record.levelname,
@@ -188,7 +189,7 @@ class HTTPHandlerDB(logging.Handler):
                          'func_name': record.funcName,
                          'line_number': str(record.lineno),
                          'msg': record.msg}
-        request_result = requests.post(url=url,
+        request_result = requests.post(url=URL_API_DB_LOGGING_BOT,
                                        data=json.dumps(dict_for_send),
                                        headers={"Content-type": "application/json"})
         self.content_request = request_result.content

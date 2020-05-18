@@ -207,35 +207,27 @@ class VKBot:
             #  если она найдена, то берем оттуда остальные значения для self.user_states[self.user_id]
             request_result = requests.get(url=URL_API_DB_USER_STATE + str(self.user_id))
             response = request_result.json()
-            print(response, 'after get')
             # if self.user_id in self.user_states: # заменяем if на проверку наличия в БД записи про этого user_id
-
             if "user_id" in response:
-
                 self.user_states[self.user_id].scenario_name = response["scenario_name"]
                 self.user_states[self.user_id].step_name = response["step_name"]
                 self.user_states[self.user_id].context = response["context"]
                 # TODO ======================================================================================
                 self.message_from_bot = self.continue_scenario(text=text_from_user)
             else:
-                print('search intent', text_from_user)
                 # search intent
                 for intent in INTENTS:
                     if any(token in text_from_user.lower() for token in intent['token']):
-                        print('run intent', text_from_user)
                         # run intent
                         if intent['answer']:
                             self.message_from_bot = intent['answer']
-                            print('self.message_from_bot = intent["answer"]', text_from_user)
                         else:
-                            print("иначе запускаем новый сценарий, добавив в БД новую запись", text_from_user)
                             # иначе запускаем новый сценарий, добавив в БД новую запись
                             self.message_from_bot = self.start_scenario(scenario_name=intent['scenario'])
 
                         break
                 else:
                     self.message_from_bot = DEFAULT_ANSWER
-            print(self.message_from_bot, 'end else in cmd_sign_up_for_conference')
             self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                         peer_id=self.user_id,
                                                                         message=self.message_from_bot,
@@ -281,7 +273,6 @@ class VKBot:
                 request_result = requests.put(url=URL_API_DB_USER_STATE + str(self.user_id),
                                               data=json.dumps(dict_for_send),
                                               headers={"Content-type": "application/json"})
-                print(request_result.json())
                 # TODO ============================================================
             else:
                 # finish scenario
@@ -289,7 +280,6 @@ class VKBot:
                 # TODO Здесь надо удалить запись из БД
                 self.user_states.pop(self.user_id)
                 request_result = requests.delete(url=URL_API_DB_USER_STATE + str(self.user_id))
-                print(request_result.json())
                 # TODO ============================================================
         else:
             # retry current step

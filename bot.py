@@ -216,16 +216,20 @@ class VKBot:
                 # TODO ======================================================================================
                 self.message_from_bot = self.continue_scenario(text=text_from_user)
             else:
-
+                print('search intent', text_from_user)
                 # search intent
                 for intent in INTENTS:
                     if any(token in text_from_user.lower() for token in intent['token']):
+                        print('run intent', text_from_user)
                         # run intent
                         if intent['answer']:
                             self.message_from_bot = intent['answer']
+                            print('self.message_from_bot = intent["answer"]', text_from_user)
                         else:
+                            print("иначе запускаем новый сценарий, добавив в БД новую запись", text_from_user)
                             # иначе запускаем новый сценарий, добавив в БД новую запись
                             self.message_from_bot = self.start_scenario(scenario_name=intent['scenario'])
+
                         break
                 else:
                     self.message_from_bot = DEFAULT_ANSWER

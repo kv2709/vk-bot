@@ -164,6 +164,7 @@ KEY_BOARD_ROAD = json.dumps(
 KEY_BOARD_EMPTY = json.dumps({"buttons": [],
                               "one_time": True}
                              )
+URL_API_DB_USER_REGISTRATION = "https://db-for-logging-vkbot.herokuapp.com/api/user_registration/"
 URL_API_DB_USER_STATE = "https://db-for-logging-vkbot.herokuapp.com/api/user_state/"
 URL_API_DB_LOGGING_BOT = 'https://db-for-logging-vkbot.herokuapp.com/api/log/'
 

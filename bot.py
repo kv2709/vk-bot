@@ -265,15 +265,12 @@ class VKBot:
             else:
                 # finish scenario
                 self.event_log_http.info(msg="Зарегистрирован: {name} с адресом {email}".format(**state.context))
-                dict_for_send = {"name": state.context[0], "email": state.context[1]}
-                # Заносим запись о новом зарегистрированном пользователе
 
-                print(dict_for_send)
+                dict_for_send = {"name": state.context["name"], "email": state.context["email"]}
+                # Заносим запись о новом зарегистрированном пользователе
                 request_result = requests.post(url=URL_API_DB_USER_REGISTRATION,
                                                data=json.dumps(dict_for_send),
                                                headers={"Content-type": "application/json"})
-                print(request_result)
-
                 self.user_states.pop(self.user_id)
                 # Удаляем запись о пользователе из таблицы userstate
                 request_result = requests.delete(url=URL_API_DB_USER_STATE + str(self.user_id))

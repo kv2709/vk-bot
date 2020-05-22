@@ -215,7 +215,7 @@ class VKBot:
                         if intent['answer']:
                             self.message_from_bot = intent['answer']
                         else:
-                            # иначе запускаем новый сценарий, добавив в БД новую запись
+                            # не найдя ответа уходим в ценарий - запускаем новый сценарий, добавив в БД новую запись
                             self.message_from_bot = self.start_scenario(scenario_name=intent['scenario'])
                         break
                 else:
@@ -267,7 +267,7 @@ class VKBot:
                 self.event_log_http.info(msg="Зарегистрирован: {name} с адресом {email}".format(**state.context))
 
                 dict_for_send = {"name": state.context["name"], "email": state.context["email"]}
-                # Заносим запись о новом зарегистрированном пользователе
+                # Заносим запись о новом зарегистрированном пользователе в таблицу registrationuser
                 request_result = requests.post(url=URL_API_DB_USER_REGISTRATION,
                                                data=json.dumps(dict_for_send),
                                                headers={"Content-type": "application/json"})

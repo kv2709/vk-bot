@@ -119,12 +119,12 @@ REG_CONF_INTENTS_LST_ANSWER = [
 ]
 
 REG_CONF_SCENARIO_LST_INPUT = [
-    ("Зарегистрируй меня", None, None, None),
-    ("КЮ", "registration", "step1", None),
-    ("Юрий-Киреев", "registration", "step1", None),
-    ("kv.gmail.com", "registration", "step2", None),
-    ("kv2709@gmail.com", "registration", "step2", {"name": "Юрий-Киреев"}),
-    ("Лабуда", None, None, None)
+    ("Зарегистрируй меня", None, None, None, 0),
+    ("КЮ", "registration", "step1", None, 1),
+    ("Юрий-Киреев", "registration", "step1", None, 2),
+    ("kv.gmail.com", "registration", "step2", None, 3),
+    ("kv2709@gmail.com", "registration", "step2", {"name": "Юрий-Киреев"}, 4),
+    ("Лабуда", None, None, None, 5)
 ]
 
 REG_CONF_SCENARIO_LST_ANSWER = [

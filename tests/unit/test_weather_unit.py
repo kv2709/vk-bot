@@ -30,6 +30,6 @@ def test_get_current_weather_for_city_list(mock_response_requests_get):
                           f"{EXPECT_ANSWER_WEATHER_STR}{'-'*50}\n"
 
 
-def test_get_forecast_weather(mock_response_requests_get_forecast):
+def test_get_forecast_weather(mock_response_requests_get):
     weather_str = wg.get_forecast(1)
     assert weather_str == EXPECT_ANSWER_FORECAST_STR

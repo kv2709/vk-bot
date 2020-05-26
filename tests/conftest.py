@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
+import sys
+import os
 import pytest
 from vk_api.bot_longpoll import *
 from vk_api.vk_api import *
+
 
 WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
 FORECAST_URL = "http://api.openweathermap.org/data/2.5/forecast"
 URL_API_DB_USER_REGISTRATION = "https://db-for-logging-vkbot.herokuapp.com/api/user_registration/"
 URL_API_DB_USER_STATE = "https://db-for-logging-vkbot.herokuapp.com/api/user_state/"
-URL_API_DB_LOGGING_BOT = 'https://db-for-logging-vkbot.herokuapp.com/api/log/'
+URL_API_DB_LOGGING_BOT = "https://db-for-logging-vkbot.herokuapp.com/api/log/"
+URL_API_GENERATE_AVATAR = "https://api.adorable.io/avatars/220/kv2709@gmail.com"
 
 
 @pytest.fixture(autouse=True)
@@ -75,9 +79,30 @@ class MockResponseJson:
         return data_weather_json_from_string()
 
 
+def data_no_user_state_json_from_string():
+    json_no_user_state_string = """{"key": "value"}"""
+    return json.loads(json_no_user_state_string)
+
+
+class MockResponseJsonNoUserState:
+    @staticmethod
+    def json():
+        return data_no_user_state_json_from_string()
+
+
+class MockResponseByteAvatar:
+
+    def __init__(self):
+        root_dir = sys.path.pop()
+        abs_path_for_avatar_file = os.path.join(root_dir, 'files/avatar-test.png')
+        with open(abs_path_for_avatar_file, 'rb') as avatar_file:
+            self.content = avatar_file.read()
+
 # -----------------------------------------------------------------------------
 # Манкипатчнутый requests.get перемещенный в фикстуру
 # Отдает json объект в зависимости от url для погоды, передаваемому ему при вызове
+
+
 @pytest.fixture()
 def mock_response_requests_get(monkeypatch):
     """
@@ -93,6 +118,8 @@ def mock_response_requests_get(monkeypatch):
             return MockResponseJsonForecast()
         elif kwargs['url'] == URL_API_DB_USER_STATE + "77209884":
             return MockResponseJsonNoUserState()
+        elif kwargs['url'] == URL_API_GENERATE_AVATAR:
+            return MockResponseByteAvatar()
 
     monkeypatch.setattr("requests.get", mock_get)
 
@@ -102,18 +129,7 @@ def mock_response_requests_get(monkeypatch):
 # ==================@pytest.fixture() def mock_response_requests_get_for_registration(monkeypatch)=============
 
 
-def data_no_user_state_json_from_string():
-    json_no_user_state_string = """{"key": "value"}"""
-    return json.loads(json_no_user_state_string)
-
-
-class MockResponseJsonNoUserState:
-    @staticmethod
-    def json():
-        return data_no_user_state_json_from_string()
-
-
-def data_json_from_string_for_user_state():
+def data_json_from_string_for_user_state_step1():
     json_user_state = """{"user_id" : "77209884", 
                           "scenario_name": "registration", 
                           "step_name": "step1", 
@@ -122,10 +138,10 @@ def data_json_from_string_for_user_state():
     return json.loads(json_user_state)
 
 
-class MockResponseJsonForRegistration:
+class MockResponseJsonForRegistrationStep1:
     @staticmethod
     def json():
-        return data_json_from_string_for_user_state()
+        return data_json_from_string_for_user_state_step1()
 
 
 def data_json_from_string_for_user_state_step2():
@@ -159,7 +175,7 @@ def mock_response_requests_get_for_registration(monkeypatch, number_call):
             if number_call == 0 or number_call == 5:
                 return MockResponseJsonNoUserState()
             elif number_call == 1 or number_call == 2:
-                return MockResponseJsonForRegistration()
+                return MockResponseJsonForRegistrationStep1()
             elif number_call == 3 or number_call == 4:
                 return MockResponseJsonForRegistrationStep2()
 

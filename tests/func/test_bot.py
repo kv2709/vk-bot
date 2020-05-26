@@ -4,6 +4,7 @@
 from bot import VKBot, UserState
 import pytest
 from tests.test_const import *
+from generate_ticket import generate_ticket
 
 
 def test_create_bot_from_my_bot_class(mock_response_requests_get,
@@ -112,10 +113,15 @@ def test_bot_for_scenario_registration_conference(cmd, scenario_name, step_name,
         if scenario_name:
             bot.user_states[77209884] = UserState(scenario_name=scenario_name, step_name=step_name, context=context)
         bot.on_event_from_dict()
-        # print("!!==", bot.user_states[77209884].scenario_name)
-        # print("!!==", bot.user_states[77209884].step_name)
-        # print("!!==", bot.user_states[77209884].context)
-
     assert bot.event.object['message']['text'] == REG_CONF_SCENARIO_LST_INPUT_revers.pop()[0]
     assert bot.message_from_bot == REG_CONF_SCENARIO_LST_ANSWER_revers.pop()
     assert bot.message_send_exec_code == 600
+
+
+def test_generate_ticket(mock_response_requests_get):
+    with open('../../files/ticket-test.png', 'rb') as expected_file:
+        expected_bytes = expected_file.read()
+    ticked_file = generate_ticket(name=REG_CONF_SCENARIO_LST_INPUT[2][0], email=REG_CONF_SCENARIO_LST_INPUT[4][0],
+                                  file_path='../../files/ticket.png', font_path='../../files/liberation-sans.ttf')
+    ticked_file_bytes = ticked_file.read()
+    assert expected_bytes == ticked_file_bytes

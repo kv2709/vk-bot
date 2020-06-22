@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+import sys
 
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+
+from generate_ticket import generate_ticket
 from weather_request import WeatherGetter
 from setup import *
 import logging.config
@@ -215,7 +218,7 @@ class VKBot:
                         if intent['answer']:
                             self.message_from_bot = intent['answer']
                         else:
-                            # не найдя ответа уходим в ценарий - запускаем новый сценарий, добавив в БД новую запись
+                            # не найдя ответа уходим в сценарий - запускаем новый сценарий, добавив в БД новую запись
                             self.message_from_bot = self.start_scenario(scenario_name=intent['scenario'])
                         break
                 else:
@@ -271,6 +274,11 @@ class VKBot:
                 request_result = requests.post(url=URL_API_DB_USER_REGISTRATION,
                                                data=json.dumps(dict_for_send),
                                                headers={"Content-type": "application/json"})
+                # Отправляем заполннный бланк билета
+                tk_image = generate_ticket(name=state.context["name"],
+                                           email=state.context["email"])
+
+                self.send_ticket_image(ticket_image=tk_image)
                 self.user_states.pop(self.user_id)
                 # Удаляем запись о пользователе из таблицы userstate
                 request_result = requests.delete(url=URL_API_DB_USER_STATE + str(self.user_id))
@@ -278,6 +286,18 @@ class VKBot:
             # retry current step
             text_to_send = step['failure_text'].format(**state.context)
         return text_to_send
+
+    def send_ticket_image(self, ticket_image):
+        upload_url = self.vk_api_get.photos.getMessagesUploadServer()['upload_url']
+        upload_data = requests.post(url=upload_url, files={'photo': ('image.png', ticket_image, 'image/png')}).json()
+        image_data = self.vk_api_get.photos.saveMessagesPhoto(**upload_data)
+        owner_id = image_data[0]['owner_id']
+        media_id = image_data[0]['id']
+        attachment = f"photo{owner_id}_{media_id}"
+        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
+                                                                    peer_id=self.user_id,
+                                                                    attachment=attachment,
+                                                                    keyboard=KEY_BOARD_RETURN_MAIN_MENU)
 
     def run(self):
         """

@@ -97,7 +97,7 @@ class MockResponseByteAvatar:
         abs_path_for_avatar_file = os.path.join(root_dir, 'files/avatar-test.png')
         with open(abs_path_for_avatar_file, 'rb') as avatar_file:
             self.content = avatar_file.read()
-
+        sys.path.append(root_dir)
 # -----------------------------------------------------------------------------
 # Манкипатчнутый requests.get перемещенный в фикстуру
 # Отдает json объект в зависимости от url для погоды, передаваемому ему при вызове
@@ -178,7 +178,14 @@ def mock_response_requests_get_for_registration(monkeypatch, number_call):
                 return MockResponseJsonForRegistrationStep1()
             elif number_call == 3 or number_call == 4:
                 return MockResponseJsonForRegistrationStep2()
-
+        elif kwargs['url'] == WEATHER_URL:
+            return MockResponseJson()
+        elif kwargs['url'] == FORECAST_URL:
+            return MockResponseJsonForecast()
+        elif kwargs['url'] == URL_API_DB_USER_STATE + "77209884":
+            return MockResponseJsonNoUserState()
+        elif kwargs['url'] == URL_API_GENERATE_AVATAR:
+            return MockResponseByteAvatar()
     monkeypatch.setattr("requests.get", mock_get)
 # ==================@pytest.fixture() def mock_response_requests_get_for_registration(monkeypatch)=============
 
@@ -325,9 +332,21 @@ def mock_vk_api_get(monkeypatch):
         return MockVkApi()
 
     monkeypatch.setattr("vk_api.VkApi.get_api", mock_get)
-
-
 # -------------------------------------------------------------------------------
+
+
+class SendTicketImage:
+    status_code = 2000
+
+
+@pytest.fixture()
+def mock_send_ticket_image_fixture(monkeypatch):
+    def mock_send_ticket_image(*args, **kwargs):
+        return SendTicketImage()
+
+    monkeypatch.setattr("bot.VKBot.send_ticket_image", mock_send_ticket_image)
+
+
 class GetClass:
     """
     Класс, создающий возможность создаваемому полю

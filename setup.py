@@ -10,6 +10,7 @@ import requests
 TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
 APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
 
+
 CMD_NO_COMMAND = None
 CMD_START = 'Начать'
 CMD_BIYSK_WEATHER_NOW = "Погода в Бийске сегодня"

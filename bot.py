@@ -279,7 +279,7 @@ class VKBot:
                                            email=state.context["email"])
 
                 print("tk_image", tk_image)
-                # self.send_ticket_image(ticket_image=tk_image)
+                self.send_ticket_image(ticket_image=tk_image)
 
                 self.user_states.pop(self.user_id)
                 # Удаляем запись о пользователе из таблицы userstate

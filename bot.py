@@ -281,6 +281,7 @@ class VKBot:
                 request_result = requests.delete(url=URL_API_DB_USER_STATE + str(self.user_id))
 
                 # Отправляем заполннный бланк билета
+                # Отсюда на Хероку не работает generate_ticket и send_ticket_image
                 tk_image = generate_ticket(name=state.context["name"],
                                            email=state.context["email"])
 

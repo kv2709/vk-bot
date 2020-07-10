@@ -275,6 +275,11 @@ class VKBot:
                                                data=json.dumps(dict_for_send),
                                                headers={"Content-type": "application/json"})
                 print(request_result.json())
+
+                self.user_states.pop(self.user_id)
+                # Удаляем запись о пользователе из таблицы userstate
+                request_result = requests.delete(url=URL_API_DB_USER_STATE + str(self.user_id))
+
                 # Отправляем заполннный бланк билета
                 tk_image = generate_ticket(name=state.context["name"],
                                            email=state.context["email"])
@@ -282,9 +287,6 @@ class VKBot:
                 print("tk_image====>>>", tk_image)
                 self.send_ticket_image(ticket_image=tk_image)
 
-                self.user_states.pop(self.user_id)
-                # Удаляем запись о пользователе из таблицы userstate
-                request_result = requests.delete(url=URL_API_DB_USER_STATE + str(self.user_id))
         else:
             # retry current step
             text_to_send = step['failure_text'].format(**state.context)

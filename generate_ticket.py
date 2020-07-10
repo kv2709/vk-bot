@@ -33,5 +33,5 @@ def generate_ticket(name, email):
     temp_file = BytesIO()
     base.save(temp_file, 'png')
     temp_file.seek(0)
-
+    print("image ready!!!!!!!!!!!")
     return temp_file

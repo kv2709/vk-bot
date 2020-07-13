@@ -17,10 +17,10 @@ URL_API_GENERATE_AVATAR = f"https://api.adorable.io/avatars/{AVATAR_SIZE}/"
 
 def generate_ticket(name, email):
     print("Start generate")
-    print("BASE_DIR => ", BASE_DIR)
-    abs_path_for_avatar_file = os.path.join(BASE_DIR, 'files/ticket.png')
+    print("BASE_DIR => ", ROOT_DIR)
+    abs_path_for_avatar_file = os.path.join(ROOT_DIR, 'files/ticket.png')
     print("abs_path_for_avatar_file => ", abs_path_for_avatar_file)
-    abs_path_for_font_file = os.path.join(BASE_DIR, 'files/liberation-sans.ttf')
+    abs_path_for_font_file = os.path.join(ROOT_DIR, 'files/liberation-sans.ttf')
     print("abs_path_for_font_file => ", abs_path_for_font_file)
     base = Image.open(abs_path_for_avatar_file).convert('RGBA')
     print("base = Image.open(abs_path_for_avatar_file).convert('RGBA')")

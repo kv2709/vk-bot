@@ -7,10 +7,14 @@ import logging
 import time
 import requests
 
-TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
-APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
+# TOKEN_API = os.environ.get('TOKEN_API_HEROKU')
+# APP_ID = os.environ.get('TOKEN_WEATHER_HEROKU')
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TOKEN_API = "329cff0dfbb52cda1f3f64a65d9a08cba6313e424121bc94347b4765dc8f65cbdc0dce00d17bd60379ea5"
+APP_ID = "11e15b9843605c694e86fee262a52d86"
+
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 CMD_NO_COMMAND = None
 CMD_START = 'Начать'
 CMD_BIYSK_WEATHER_NOW = "Погода в Бийске сегодня"

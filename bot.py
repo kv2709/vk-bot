@@ -74,11 +74,7 @@ class VKBot:
                                 f"из другого диалога с Вашим комментарием. Из полезной функциональности Бот умеет " \
                                 f" показывать прогноз погоды в Бийске и Новосибирске на сегодня и на пять дней"
 
-        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                    peer_id=self.user_id,
-                                                                    message=self.message_from_bot,
-                                                                    keyboard=KEY_BOARD)
-
+        self.send_text_to_user(keyboard=KEY_BOARD)
         self.log_send_status_code = self.event_log_http.handlers[0].status_code_request
         self.event_log_http.debug(msg=f"Пользователь {first_last_name} запустил новый сеанс бота. "
                                       f"Отправка сообщения завершена с кодом "
@@ -97,10 +93,7 @@ class VKBot:
                 self.message_from_bot += f", переславшего сообщение " \
                                          f"<{self.event.object.message['fwd_messages'][0]['text']}> " \
                                          f"от {first_last_name_reply}"
-            self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                        peer_id=self.user_id,
-                                                                        message=self.message_from_bot,
-                                                                        keyboard=KEY_BOARD)
+            self.send_text_to_user(keyboard=KEY_BOARD)
             self.event_log_http.debug(msg=f"Выдан эхо-ответ на входящее "
                                           f"<{self.event.object.message['text']}> от "
                                           f"{first_last_name}. "
@@ -114,18 +107,12 @@ class VKBot:
 
     def cmd_menu_road_forecast(self):
         self.message_from_bot = "Загружено дорожное меню"
-        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                    peer_id=self.user_id,
-                                                                    message=self.message_from_bot,
-                                                                    keyboard=KEY_BOARD_ROAD)
+        self.send_text_to_user(keyboard=KEY_BOARD_ROAD)
 
     def cmd_return_main_menu(self):
         self.status_bot_sing_up_conf = False
         self.message_from_bot = "Загружено основное меню"
-        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                    peer_id=self.user_id,
-                                                                    message=self.message_from_bot,
-                                                                    keyboard=KEY_BOARD)
+        self.send_text_to_user(keyboard=KEY_BOARD)
 
     def cmd_biysk_novosibirsk_road_weather_now(self):
         self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Gen')
@@ -138,10 +125,7 @@ class VKBot:
                                                                                TROITSKOYE_ID,
                                                                                BIYSK_ID,
                                                                                )
-        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                    peer_id=self.user_id,
-                                                                    message=self.message_from_bot,
-                                                                    keyboard=KEY_BOARD_ROAD)
+        self.send_text_to_user(keyboard=KEY_BOARD_ROAD)
         self.event_log_http.debug(msg=f"Выдана погода по трассе Нск-Бск для "
                                       f"{first_last_name}. "
                                       f"Отправка сообщения завершена с кодом "
@@ -151,10 +135,7 @@ class VKBot:
         self.user_info = self.vk_api_get.users.get(user_id=self.user_id, name_case='Gen')
         first_last_name = f"{self.user_info[0]['first_name']} {self.user_info[0]['last_name']}"
         self.message_from_bot = 'Функция в разработке'
-        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                    peer_id=self.user_id,
-                                                                    message=self.message_from_bot,
-                                                                    keyboard=KEY_BOARD_ROAD)
+        self.send_text_to_user(keyboard=KEY_BOARD_ROAD)
         self.event_log_http.debug(msg=f"Функция в разработке: погода по трассе Бск-Кош-Агач для "
                                       f"{first_last_name}. "
                                       f"Отправка сообщения завершена с кодом "
@@ -162,41 +143,25 @@ class VKBot:
 
     def cmd_biysk_weather_now(self):
         self.message_from_bot = self.weather.get_current_weather(city_id=BIYSK_ID)
-        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                    peer_id=self.user_id,
-                                                                    message=self.message_from_bot,
-                                                                    keyboard=KEY_BOARD)
+        self.send_text_to_user(keyboard=KEY_BOARD)
 
     def cmd_biysk_weather_forecast(self):
         self.message_from_bot = self.weather.get_forecast(city_id=BIYSK_ID)
-        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                    peer_id=self.user_id,
-                                                                    message=self.message_from_bot,
-                                                                    keyboard=KEY_BOARD)
+        self.send_text_to_user(keyboard=KEY_BOARD)
 
     def cmd_novosibirsk_weather_now(self):
         self.message_from_bot = self.weather.get_current_weather(city_id=NOVOSIBIRSK_ID)
-        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                    peer_id=self.user_id,
-                                                                    message=self.message_from_bot,
-                                                                    keyboard=KEY_BOARD)
+        self.send_text_to_user(keyboard=KEY_BOARD)
 
     def cmd_novosibirsk_weather_forecast(self):
         self.message_from_bot = self.weather.get_forecast(city_id=NOVOSIBIRSK_ID)
-        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                    peer_id=self.user_id,
-                                                                    message=self.message_from_bot,
-                                                                    keyboard=KEY_BOARD)
+        self.send_text_to_user(keyboard=KEY_BOARD)
 
     def cmd_sign_up_for_conference(self):
-
         if not self.status_bot_sing_up_conf:
             self.status_bot_sing_up_conf = True
             self.message_from_bot = "Бот переключен в режим <Регистрация на конференцию>"
-            self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                        peer_id=self.user_id,
-                                                                        message=self.message_from_bot,
-                                                                        keyboard=KEY_BOARD_RETURN_MAIN_MENU)
+            self.send_text_to_user(keyboard=KEY_BOARD_RETURN_MAIN_MENU)
         else:
             text_from_user = self.event.object.message['text']
             # Получили текст от пользователя, знаем его self.user_id
@@ -209,7 +174,8 @@ class VKBot:
                 self.user_states[self.user_id].scenario_name = response["scenario_name"]
                 self.user_states[self.user_id].step_name = response["step_name"]
                 self.user_states[self.user_id].context = response["context"]
-                self.message_from_bot = self.continue_scenario(text=text_from_user)
+                self.continue_scenario(text=text_from_user)
+                # и там отправляем send_step
             else:
                 # search intent
                 for intent in INTENTS:
@@ -217,16 +183,32 @@ class VKBot:
                         # run intent
                         if intent['answer']:
                             self.message_from_bot = intent['answer']
+                            self.send_text_to_user(keyboard=KEY_BOARD_RETURN_MAIN_MENU)
+                        #     отправили ответ по интенту
                         else:
                             # не найдя ответа уходим в сценарий - запускаем новый сценарий, добавив в БД новую запись
-                            self.message_from_bot = self.start_scenario(scenario_name=intent['scenario'])
+                            self.start_scenario(scenario_name=intent['scenario'])
                         break
                 else:
                     self.message_from_bot = DEFAULT_ANSWER
-            self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
-                                                                        peer_id=self.user_id,
-                                                                        message=self.message_from_bot,
-                                                                        keyboard=KEY_BOARD_RETURN_MAIN_MENU)
+                    self.send_text_to_user(keyboard=KEY_BOARD_RETURN_MAIN_MENU)
+
+    def send_text_to_user(self, text_to_send=None, keyboard=None):
+        if text_to_send:
+            self.message_from_bot = text_to_send
+        kbd = keyboard
+        self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
+                                                                    peer_id=self.user_id,
+                                                                    message=self.message_from_bot,
+                                                                    keyboard=kbd)
+
+    def send_step(self, step, text, context):
+        if "text" in step:
+            self.send_text_to_user(text_to_send=text, keyboard=KEY_BOARD_RETURN_MAIN_MENU)
+        if "image" in step:
+            handler = getattr(handlers, step['image'])
+            image = handler(text=text, context=context)
+            self.send_ticket_image(ticket_image=image)
 
     def start_scenario(self, scenario_name):
         scenario = SCENARIO[scenario_name]
@@ -243,7 +225,7 @@ class VKBot:
         request_result = requests.post(url=URL_API_DB_USER_STATE,
                                        data=json.dumps(dict_for_send),
                                        headers={"Content-type": "application/json"})
-        return text_to_send
+        self.send_step(step=step, text=text_to_send, context=self.user_states[self.user_id].context)
 
     def continue_scenario(self, text):
         state = self.user_states[self.user_id]
@@ -265,6 +247,7 @@ class VKBot:
                 request_result = requests.put(url=URL_API_DB_USER_STATE + str(self.user_id),
                                               data=json.dumps(dict_for_send),
                                               headers={"Content-type": "application/json"})
+                self.send_step(step=next_step, text=text_to_send, context=self.user_states[self.user_id].context)
             else:
                 # finish scenario
                 self.event_log_http.info(msg="Зарегистрирован: {name} с адресом {email}".format(**state.context))
@@ -274,35 +257,24 @@ class VKBot:
                 request_result = requests.post(url=URL_API_DB_USER_REGISTRATION,
                                                data=json.dumps(dict_for_send),
                                                headers={"Content-type": "application/json"})
-                print(request_result.json())
+
+                self.send_step(step=next_step, text=text_to_send, context=self.user_states[self.user_id].context)
 
                 self.user_states.pop(self.user_id)
                 # Удаляем запись о пользователе из таблицы userstate
                 request_result = requests.delete(url=URL_API_DB_USER_STATE + str(self.user_id))
-
-                # Отправляем заполннный бланк билета
-                # Отсюда на Хероку не работает generate_ticket и send_ticket_image
-                tk_image = generate_ticket(name=state.context["name"],
-                                           email=state.context["email"])
-
-                print("tk_image====>>>", tk_image)
-                self.send_ticket_image(ticket_image=tk_image)
-
         else:
             # retry current step
             text_to_send = step['failure_text'].format(**state.context)
-        return text_to_send
+            self.send_text_to_user(text_to_send=text_to_send, keyboard=KEY_BOARD_RETURN_MAIN_MENU)
 
     def send_ticket_image(self, ticket_image):
         upload_url = self.vk_api_get.photos.getMessagesUploadServer()['upload_url']
-        print("upload_url====>>>", upload_url)
         upload_data = requests.post(url=upload_url, files={'photo': ('image.png', ticket_image, 'image/png')}).json()
-        print("upload_data====>>>", upload_data)
         image_data = self.vk_api_get.photos.saveMessagesPhoto(**upload_data)
         owner_id = image_data[0]['owner_id']
         media_id = image_data[0]['id']
         attachment = f"photo{owner_id}_{media_id}"
-        print("attachment====>>>", attachment)
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
                                                                     attachment=attachment,

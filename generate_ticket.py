@@ -1,4 +1,5 @@
-import sys
+# -*- coding: utf-8 -*-
+
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 from tests.test_const import *

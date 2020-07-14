@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import re
-
 from generate_ticket import generate_ticket
 
 re_name = re.compile(r'^[\w\-\s]{3,40}$')

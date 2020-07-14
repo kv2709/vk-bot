@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-import sys
 
 import vk_api
-from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-
-from generate_ticket import generate_ticket
-from weather_request import WeatherGetter
-from setup import *
 import logging.config
 import handlers
+
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+from weather_request import WeatherGetter
+from setup import *
 
 
 class UserState:
@@ -165,11 +163,11 @@ class VKBot:
         else:
             text_from_user = self.event.object.message['text']
             # Получили текст от пользователя, знаем его self.user_id
-            # пошли в базу за за поиском там записи для него и
+            # пошли в базу за поиском там записи для него и
             # если она найдена, то берем оттуда остальные значения для self.user_states[self.user_id]
             request_result = requests.get(url=URL_API_DB_USER_STATE + str(self.user_id))
             response = request_result.json()
-            # заменяем if на проверку наличия в БД записи про этого user_id
+            # Проверяем наличие в БД записи про этого user_id
             if "user_id" in response:
                 self.user_states[self.user_id].scenario_name = response["scenario_name"]
                 self.user_states[self.user_id].step_name = response["step_name"]
@@ -177,14 +175,15 @@ class VKBot:
                 self.continue_scenario(text=text_from_user)
                 # и там отправляем send_step
             else:
-                # search intent
+                # Ищем по интенту
                 for intent in INTENTS:
                     if any(token in text_from_user.lower() for token in intent['token']):
                         # run intent
                         if intent['answer']:
                             self.message_from_bot = intent['answer']
+                            # отправили ответ по интенту
                             self.send_text_to_user(keyboard=KEY_BOARD_RETURN_MAIN_MENU)
-                        #     отправили ответ по интенту
+
                         else:
                             # не найдя ответа уходим в сценарий - запускаем новый сценарий, добавив в БД новую запись
                             self.start_scenario(scenario_name=intent['scenario'])
@@ -196,11 +195,14 @@ class VKBot:
     def send_text_to_user(self, text_to_send=None, keyboard=None):
         if text_to_send:
             self.message_from_bot = text_to_send
-        kbd = keyboard
+        if keyboard:
+            keyboard_for_send = keyboard
+        else:
+            keyboard_for_send = KEY_BOARD
         self.message_send_exec_code = self.vk_api_get.messages.send(random_id=get_random_id(),
                                                                     peer_id=self.user_id,
                                                                     message=self.message_from_bot,
-                                                                    keyboard=kbd)
+                                                                    keyboard=keyboard_for_send)
 
     def send_step(self, step, text, context):
         if "text" in step:
@@ -236,7 +238,7 @@ class VKBot:
             next_step = steps[step['next_step']]
             text_to_send = next_step['text'].format(**state.context)
             if next_step['next_step']:
-                # swith next step
+                # Переключаемся на следующий шаг сценария
                 state.step_name = step['next_step']
                 # Обновляем запись user_state в базе
                 dict_for_send = {'user_id': str(self.user_id),
@@ -249,7 +251,7 @@ class VKBot:
                                               headers={"Content-type": "application/json"})
                 self.send_step(step=next_step, text=text_to_send, context=self.user_states[self.user_id].context)
             else:
-                # finish scenario
+                # Завершаем сценарий
                 self.event_log_http.info(msg="Зарегистрирован: {name} с адресом {email}".format(**state.context))
 
                 dict_for_send = {"name": state.context["name"], "email": state.context["email"]}

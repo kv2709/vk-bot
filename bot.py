@@ -7,6 +7,7 @@ import handlers
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from weather_request import WeatherGetter
 from setup import *
+# deploy for new Heroku stack
 
 
 class UserState:
